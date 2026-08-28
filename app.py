@@ -1,0 +1,958 @@
+import streamlit as st
+import pandas as pd
+import os
+import time
+import uuid
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Any
+
+# ==================================================
+# PAGE CONFIG
+# ==================================================
+
+st.set_page_config(
+    page_title="Real or AI?",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# ==================================================
+# CONSTANTS
+# ==================================================
+
+RESULT_FILE = "data/responses_final.csv"
+MEDIA_BASE = Path("media")
+
+# Colours
+PURPLE = "#6C2E8B"
+LIGHT_PURPLE = "#F3EDF7"
+SOFT_PURPLE = "#DCC8E8"
+GREEN = "#248A57"
+RED = "#B33A3A"
+
+# ==================================================
+# CSS – Enhanced Design (with fix for top clipping)
+# ==================================================
+
+def inject_custom_css():
+    st.html(
+        f"""
+        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+        <style>
+            * {{
+                font-family: 'Inter', sans-serif;
+            }}
+
+            .block-container {{
+                max-width: 1200px;
+                padding-top: 2.2rem;
+                padding-bottom: 4rem;
+            }}
+
+            .hero {{
+                text-align: center;
+                padding: 0.4rem 0 1.4rem 0;
+                margin-top: 0.2rem;
+            }}
+
+            .hero-badge {{
+                display: inline-block;
+                color: {PURPLE};
+                background: {LIGHT_PURPLE};
+                border: 1px solid {SOFT_PURPLE};
+                padding: 0.4rem 1rem;
+                border-radius: 999px;
+                font-size: 0.78rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                margin-bottom: 0.9rem;
+            }}
+
+            .hero-title {{
+                font-size: clamp(2.8rem, 7vw, 4.6rem);
+                font-weight: 900;
+                line-height: 1.1;
+                margin: 0;
+                background: linear-gradient(135deg, {PURPLE}, #A855F7);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }}
+
+            .hero-subtitle {{
+                max-width: 700px;
+                margin: 1rem auto 0 auto;
+                opacity: 0.75;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }}
+
+            .purple-line {{
+                height: 4px;
+                width: 60px;
+                border-radius: 100px;
+                background: {PURPLE};
+                margin: 1rem auto 1.5rem auto;
+            }}
+
+            .round-label {{
+                width: fit-content;
+                margin: 0 auto 0.8rem auto;
+                color: {PURPLE};
+                background: {LIGHT_PURPLE};
+                padding: 0.4rem 1rem;
+                border-radius: 999px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+            }}
+
+            .question-heading {{
+                font-size: 1.3rem;
+                font-weight: 800;
+                margin-bottom: 0.2rem;
+            }}
+
+            .question-subheading {{
+                opacity: 0.65;
+                font-size: 0.95rem;
+                margin-bottom: 0.8rem;
+            }}
+
+            div[data-testid="stVerticalBlockBorderWrapper"] {{
+                border-radius: 20px;
+                border-color: {SOFT_PURPLE};
+                box-shadow: 0 8px 24px rgba(108, 46, 139, 0.06);
+                transition: box-shadow 0.2s ease;
+            }}
+
+            div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
+                box-shadow: 0 12px 32px rgba(108, 46, 139, 0.10);
+            }}
+
+            .stButton > button,
+            .stFormSubmitButton > button {{
+                border-radius: 14px;
+                min-height: 52px;
+                font-weight: 700;
+                font-size: 1rem;
+                transition: all 0.2s ease;
+                border: none;
+            }}
+
+            .stButton > button:hover,
+            .stFormSubmitButton > button:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(108, 46, 139, 0.25);
+            }}
+
+            button[kind="primary"] {{
+                background: {PURPLE} !important;
+                color: white !important;
+            }}
+
+            button[kind="primary"]:hover {{
+                background: #7C3E9E !important;
+            }}
+
+            div[data-testid="stTextInput"] input {{
+                border-radius: 14px;
+                min-height: 52px;
+                font-size: 1rem;
+                border: 1.5px solid {SOFT_PURPLE};
+                transition: border-color 0.2s;
+            }}
+
+            div[data-testid="stTextInput"] input:focus {{
+                border-color: {PURPLE};
+                box-shadow: 0 0 0 3px rgba(108, 46, 139, 0.15);
+            }}
+
+            div[data-testid="stRadio"] label p {{
+                font-weight: 600;
+                font-size: 1rem;
+            }}
+
+            div[data-testid="stRadio"] label {{
+                padding: 0.5rem 0.8rem;
+                border-radius: 12px;
+                transition: background 0.15s;
+            }}
+
+            div[data-testid="stRadio"] label:hover {{
+                background: {LIGHT_PURPLE};
+            }}
+
+            div[data-testid="stProgress"] > div > div > div > div {{
+                background: linear-gradient(90deg, {PURPLE}, #A855F7);
+                border-radius: 100px;
+            }}
+
+            .final-score {{
+                text-align: center;
+                padding: 1.5rem 0 2rem 0;
+            }}
+
+            .score-number {{
+                font-size: 4.8rem;
+                font-weight: 900;
+                background: linear-gradient(135deg, {PURPLE}, #A855F7);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.2;
+                margin: 0.5rem 0;
+            }}
+
+            .score-caption {{
+                font-size: 1.1rem;
+                opacity: 0.7;
+            }}
+
+            .review-title {{
+                text-align: center;
+                color: {PURPLE};
+                font-size: 1.7rem;
+                font-weight: 850;
+                margin-top: 2.5rem;
+                margin-bottom: 0.3rem;
+            }}
+
+            .review-subtitle {{
+                text-align: center;
+                opacity: 0.65;
+                margin-bottom: 1.5rem;
+            }}
+
+            .correct-box {{
+                background: rgba(36, 138, 87, 0.08);
+                border-left: 5px solid {GREEN};
+                padding: 1rem 1.2rem;
+                border-radius: 12px;
+                margin-bottom: 0.8rem;
+            }}
+
+            .incorrect-box {{
+                background: rgba(179, 58, 58, 0.08);
+                border-left: 5px solid {RED};
+                padding: 1rem 1.2rem;
+                border-radius: 12px;
+                margin-bottom: 0.8rem;
+            }}
+
+            .metric-card {{
+                background: {LIGHT_PURPLE};
+                border-radius: 16px;
+                padding: 1.2rem 1rem;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            }}
+
+            .metric-value {{
+                font-size: 2rem;
+                font-weight: 800;
+                color: {PURPLE};
+            }}
+
+            .metric-label {{
+                font-size: 0.9rem;
+                opacity: 0.7;
+                margin-top: 0.2rem;
+            }}
+
+            .leaderboard-table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1rem;
+            }}
+            .leaderboard-table th {{
+                background: {LIGHT_PURPLE};
+                color: {PURPLE};
+                font-weight: 700;
+                padding: 0.8rem 0.5rem;
+                text-align: center;
+            }}
+            .leaderboard-table td {{
+                padding: 0.6rem 0.5rem;
+                text-align: center;
+                border-bottom: 1px solid {SOFT_PURPLE};
+            }}
+            .leaderboard-table tr:hover {{
+                background: {LIGHT_PURPLE};
+            }}
+            .leaderboard-rank {{
+                font-weight: 800;
+                color: {PURPLE};
+            }}
+
+            @media (max-width: 640px) {{
+                .block-container {{
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }}
+                .metric-value {{
+                    font-size: 1.6rem;
+                }}
+            }}
+        </style>
+        """
+    )
+
+
+# ==================================================
+# ROUND DEFINITIONS
+# ==================================================
+
+ROUNDS: List[Dict[str, Any]] = [
+    {
+        "id": "video1",
+        "type": "single_video",
+        "file": "media/single/video1.mp4",
+        "ground_truth": "Real",
+        "notes": "authentic"
+    },
+    {
+        "id": "video2",
+        "type": "single_video",
+        "file": "media/single/video2.mp4",
+        "ground_truth": "AI-generated",
+        "notes": "ai_generated"
+    },
+    {
+        "id": "video3",
+        "type": "single_video",
+        "file": "media/single/video3.mp4",
+        "ground_truth": "Real",
+        "notes": "authentic"
+    },
+    {
+        "id": "video4",
+        "type": "single_video",
+        "file": "media/single/video4.mp4",
+        "ground_truth": "Real",
+        "notes": "authentic"
+    },
+    {
+        "id": "video5",
+        "type": "single_video",
+        "file": "media/single/video5.mp4",
+        "ground_truth": "AI-generated",
+        "notes": "ai_generated"
+    },
+    {
+        "id": "video6",
+        "type": "single_video",
+        "file": "media/single/video6.mp4",
+        "ground_truth": "Real",
+        "notes": "edited_non_ai"
+    },
+    {
+        "id": "pair1",
+        "type": "pair_video",
+        "left": "media/pairs/pair1_left.mp4",
+        "right": "media/pairs/pair1_right.mp4",
+        "ground_truth": "Left",
+        "notes": "left_ai_right_real"
+    },
+    {
+        "id": "pair2",
+        "type": "pair_video",
+        "left": "media/pairs/pair2_left.mp4",
+        "right": "media/pairs/pair2_right.mp4",
+        "ground_truth": "Right",
+        "notes": "left_real_right_ai"
+    },
+    {
+        "id": "delft",
+        "type": "pair_image",
+        "left": "media/delft/real.jpg",
+        "right": "media/delft/ai.jpg",
+        "ground_truth": "Right",
+        "notes": "left_real_right_ai"
+    }
+]
+
+# ==================================================
+# SESSION STATE INITIALISATION
+# ==================================================
+
+def init_session_state():
+    defaults = {
+        "started": False,
+        "participant_name": "",
+        "participant_id": None,
+        "current_round": 0,
+        "responses": [],
+        "round_start_time": None,
+        "saved": False,
+        "post_quiz_answered": False,
+        "post_quiz_responses": {}
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+
+# ==================================================
+# HELPER FUNCTIONS
+# ==================================================
+
+def media_file_exists(path: str) -> bool:
+    p = Path(path)
+    return p.exists() and p.stat().st_size > 0
+
+
+def validate_round_media(round_data: Dict[str, Any]) -> List[str]:
+    missing = []
+    if round_data["type"] == "single_video":
+        if not media_file_exists(round_data["file"]):
+            missing.append(round_data["file"])
+    elif round_data["type"] in ("pair_video", "pair_image"):
+        for key in ("left", "right"):
+            if not media_file_exists(round_data[key]):
+                missing.append(round_data[key])
+    return missing
+
+
+def save_results():
+    """Append current session responses to CSV."""
+    os.makedirs("data", exist_ok=True)
+    columns = [
+        "participant_name", "participant_id", "timestamp",
+        "round", "stimulus_id", "stimulus_type", "stimulus_notes",
+        "ground_truth", "answer", "correct", "confidence",
+        "response_time_seconds"
+    ]
+    df = pd.DataFrame(st.session_state.responses, columns=columns)
+    if os.path.exists(RESULT_FILE):
+        df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
+    else:
+        df.to_csv(RESULT_FILE, index=False)
+
+
+def save_post_quiz():
+    """Save the two post‑quiz answers as a special round (round=0)."""
+    if not st.session_state.post_quiz_responses:
+        return
+    os.makedirs("data", exist_ok=True)
+    row = {
+        "participant_name": st.session_state.participant_name,
+        "participant_id": st.session_state.participant_id,
+        "timestamp": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "round": 0,
+        "stimulus_id": "post_quiz",
+        "stimulus_type": "post_quiz",
+        "stimulus_notes": "",
+        "ground_truth": "",
+        "answer": json.dumps(st.session_state.post_quiz_responses),
+        "correct": "",
+        "confidence": 0,
+        "response_time_seconds": 0
+    }
+    df = pd.DataFrame([row])
+    if os.path.exists(RESULT_FILE):
+        df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
+    else:
+        df.to_csv(RESULT_FILE, index=False)
+
+
+def restart_quiz():
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()
+
+
+def scroll_to_top():
+    st.components.v1.html(
+        """
+        <script>
+            window.scrollTo(0, 0);
+        </script>
+        """,
+        height=0,
+    )
+
+
+# ==================================================
+# UI COMPONENTS
+# ==================================================
+
+def render_hero():
+    st.html(
+        """
+        <div class="hero">
+            <div class="hero-badge">AI DeMoS Lab • TU Delft</div>
+            <div class="hero-title">🤖 Real or AI?</div>
+            <div class="purple-line"></div>
+            <div class="hero-subtitle">
+                Can you tell the difference between authentic,
+                traditionally edited and AI‑generated media?
+            </div>
+        </div>
+        """
+    )
+
+
+def render_start_screen():
+    render_hero()
+    col_left, col_center, col_right = st.columns([0.55, 2.2, 0.55])
+    with col_center:
+        st.image("media/demos_lab.png", use_container_width=True)
+    st.write("")
+    with st.container(border=True):
+        st.html(f"""
+            <div style="color:{PURPLE}; font-weight:800; font-size:1.4rem; margin-bottom:0.7rem;">
+                Ready to play?
+            </div>
+        """)
+        st.markdown("""
+            You will see **9 pieces of media**.
+
+            Your task is simple:  
+            **Decide whether the content is real or AI‑generated.**
+
+            For some rounds, you will compare two pieces of media.
+
+            After each answer, tell us how confident you are.
+
+            **Estimated time: 4–6 minutes.**
+        """)
+        with st.form("start_form"):
+            name = st.text_input("Enter your name or nickname", placeholder="e.g. Umut")
+            submitted = st.form_submit_button("Start Quiz →", type="primary", use_container_width=True)
+            if submitted:
+                cleaned = " ".join(name.split())
+                if not cleaned:
+                    st.warning("Please enter your name or nickname.")
+                else:
+                    st.session_state.participant_name = cleaned
+                    st.session_state.participant_id = str(uuid.uuid4())[:8]
+                    st.session_state.current_round = 0
+                    st.session_state.responses = []
+                    st.session_state.saved = False
+                    st.session_state.round_start_time = time.time()
+                    st.session_state.started = True
+                    st.session_state.post_quiz_answered = False
+                    st.session_state.post_quiz_responses = {}
+                    st.rerun()
+
+
+def render_single_video(round_data: Dict[str, Any]):
+    with st.container(border=True):
+        missing = validate_round_media(round_data)
+        if missing:
+            st.warning(f"⚠️ Media file not found: {missing[0]}. Please check your assets.")
+            return
+        _, center, _ = st.columns([1, 1.65, 1])
+        with center:
+            st.video(round_data["file"])
+        st.html("""
+            <div class="question-heading">Is this video AI‑generated?</div>
+            <div class="question-subheading">Trust your first impression.</div>
+        """)
+        return st.radio(
+            "Answer",
+            ["Real", "AI-generated", "Not sure"],
+            index=None,
+            horizontal=True,
+            label_visibility="collapsed",
+            key=f"answer_{st.session_state.current_round}"
+        )
+
+
+def render_pair_video(round_data: Dict[str, Any]):
+    missing = validate_round_media(round_data)
+    if missing:
+        st.warning(f"⚠️ Media file(s) missing: {', '.join(missing)}")
+        return
+    st.html(f"""
+        <div style="text-align:center; color:{PURPLE}; font-size:1.4rem; font-weight:800;">
+            Which video is AI‑generated?
+        </div>
+        <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
+            One of these videos is AI‑generated.
+        </div>
+    """)
+    left_col, right_col = st.columns(2, gap="large")
+    with left_col:
+        st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800; margin-bottom:0.4rem;'>← LEFT</div>")
+        st.video(round_data["left"])
+    with right_col:
+        st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800; margin-bottom:0.4rem;'>RIGHT →</div>")
+        st.video(round_data["right"])
+    st.write("")
+    with st.container(border=True):
+        return st.radio(
+            "Which video is AI‑generated?",
+            ["Left", "Right", "Not sure"],
+            index=None,
+            horizontal=True,
+            key=f"answer_{st.session_state.current_round}"
+        )
+
+
+def render_pair_image(round_data: Dict[str, Any]):
+    missing = validate_round_media(round_data)
+    if missing:
+        st.warning(f"⚠️ Image file(s) missing: {', '.join(missing)}")
+        return
+    st.html(f"""
+        <div style="text-align:center; color:{PURPLE}; font-size:1.4rem; font-weight:800;">
+            Final challenge: TU Delft
+        </div>
+        <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
+            One image is authentic. The other is AI‑generated.
+        </div>
+    """)
+    left_col, right_col = st.columns(2, gap="large")
+    with left_col:
+        st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800; margin-bottom:0.4rem;'>← LEFT</div>")
+        st.image(round_data["left"], use_container_width=True)
+    with right_col:
+        st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800; margin-bottom:0.4rem;'>RIGHT →</div>")
+        st.image(round_data["right"], use_container_width=True)
+    st.write("")
+    with st.container(border=True):
+        return st.radio(
+            "Which image is AI‑generated?",
+            ["Left", "Right", "Not sure"],
+            index=None,
+            horizontal=True,
+            key=f"answer_{st.session_state.current_round}"
+        )
+
+
+def render_round():
+    round_num = st.session_state.current_round
+    round_data = ROUNDS[round_num]
+
+    st.html(f'<div class="round-label">ROUND {round_num + 1} OF {len(ROUNDS)}</div>')
+    st.progress((round_num + 1) / len(ROUNDS))
+    st.write("")
+
+    if round_data["type"] == "single_video":
+        answer = render_single_video(round_data)
+    elif round_data["type"] == "pair_video":
+        answer = render_pair_video(round_data)
+    elif round_data["type"] == "pair_image":
+        answer = render_pair_image(round_data)
+    else:
+        st.error("Unknown round type.")
+        return
+
+    st.write("")
+    with st.container(border=True):
+        st.html("""
+            <div class="question-heading">How confident are you?</div>
+            <div class="question-subheading">
+                1 = pure guess &nbsp;&nbsp;•&nbsp;&nbsp; 5 = very confident
+            </div>
+        """)
+        _, slider_col, _ = st.columns([0.3, 3, 0.3])
+        with slider_col:
+            confidence = st.slider(
+                "Confidence",
+                min_value=1, max_value=5, value=3,
+                label_visibility="collapsed",
+                key=f"confidence_{round_num}"
+            )
+
+    st.write("")
+    _, btn_col, _ = st.columns([1.2, 1, 1.2])
+    with btn_col:
+        next_clicked = st.button("Lock answer →", type="primary", use_container_width=True)
+
+    if next_clicked:
+        if answer is None:
+            st.warning("Please choose an answer before continuing.")
+            return
+
+        response_time = round(time.time() - st.session_state.round_start_time, 2)
+        correct = (answer == round_data["ground_truth"])
+
+        response = {
+            "participant_name": st.session_state.participant_name,
+            "participant_id": st.session_state.participant_id,
+            "timestamp": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "round": round_num + 1,
+            "stimulus_id": round_data["id"],
+            "stimulus_type": round_data["type"],
+            "stimulus_notes": round_data["notes"],
+            "ground_truth": round_data["ground_truth"],
+            "answer": answer,
+            "correct": correct,
+            "confidence": confidence,
+            "response_time_seconds": response_time
+        }
+
+        st.session_state.responses.append(response)
+        st.session_state.current_round += 1
+        st.session_state.round_start_time = time.time()
+        st.rerun()
+
+
+def render_post_quiz():
+    """Show two extra questions as a separate page."""
+    st.html(f"""
+        <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
+            A few final questions
+        </div>
+        <div style="text-align:center; opacity:0.7; margin-bottom:1.5rem;">
+            Your honest feedback helps our research.
+        </div>
+    """)
+
+    with st.container(border=True):
+        q1 = st.slider(
+            "After this quiz, do you feel more skeptical about content you see online?",
+            min_value=1, max_value=5, value=3,
+            help="1 = Not at all, 5 = Very skeptical"
+        )
+        q2 = st.slider(
+            "Do you think frequent exposure to AI-generated content makes it harder to trust real content?",
+            min_value=1, max_value=5, value=3,
+            help="1 = Strongly disagree, 5 = Strongly agree"
+        )
+
+        if st.button("Submit feedback", type="primary", use_container_width=True):
+            st.session_state.post_quiz_responses = {
+                "skepticism": q1,
+                "trust_harder": q2
+            }
+            save_post_quiz()
+            st.session_state.post_quiz_answered = True
+            st.rerun()
+
+
+def render_leaderboard():
+    """Display a leaderboard of all participants who completed all rounds."""
+    if not os.path.exists(RESULT_FILE):
+        st.info("No data yet – be the first to complete the quiz!")
+        return
+
+    df = pd.read_csv(RESULT_FILE)
+    df_rounds = df[df["round"] > 0]
+    if df_rounds.empty:
+        st.info("No quiz data found yet.")
+        return
+
+    grouped = df_rounds.groupby("participant_id").agg(
+        participant_name=("participant_name", "first"),
+        total_rounds=("round", "count"),
+        correct=("correct", "sum")
+    ).reset_index()
+
+    grouped = grouped[grouped["total_rounds"] == len(ROUNDS)]
+    if grouped.empty:
+        st.info("No complete quiz records yet.")
+        return
+
+    grouped["accuracy"] = (grouped["correct"] / len(ROUNDS) * 100).round(1)
+    grouped = grouped.sort_values("correct", ascending=False).reset_index(drop=True)
+    grouped.index = grouped.index + 1
+
+    st.html("""
+        <div style="margin-top: 2.5rem; text-align:center;">
+            <span style="font-size:1.5rem; font-weight:800; color:#6C2E8B;">🏆 Leaderboard</span>
+        </div>
+    """)
+
+    table_html = """
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Correct</th>
+                <th>Accuracy</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
+    for idx, row in grouped.iterrows():
+        rank = idx
+        name = row["participant_name"]
+        correct = int(row["correct"])
+        acc = row["accuracy"]
+        table_html += f"""
+            <tr>
+                <td class="leaderboard-rank">#{rank}</td>
+                <td>{name}</td>
+                <td>{correct}/{len(ROUNDS)}</td>
+                <td>{acc}%</td>
+            </tr>
+        """
+    table_html += "</tbody></table>"
+    st.markdown(table_html, unsafe_allow_html=True)
+
+
+def render_results():
+    scroll_to_top()
+
+    if not st.session_state.saved:
+        save_results()
+        st.session_state.saved = True
+
+    responses = st.session_state.responses
+    total = len(responses)
+    correct_count = sum(1 for r in responses if r["correct"])
+    avg_confidence = round(sum(r["confidence"] for r in responses) / total, 1) if total else 0
+
+    st.html(f"""
+        <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
+            Quiz complete 🎉
+        </div>
+        <div class="final-score">
+            <div class="score-caption">{st.session_state.participant_name}, your score is</div>
+            <div class="score-number">{correct_count}/{total}</div>
+            <div class="score-caption">
+                You correctly identified <strong>{round((correct_count/total)*100)}%</strong> of the media.
+            </div>
+        </div>
+    """)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.html(f"""
+            <div class="metric-card">
+                <div class="metric-value">{correct_count}/{total}</div>
+                <div class="metric-label">Correct</div>
+            </div>
+        """)
+    with col2:
+        st.html(f"""
+            <div class="metric-card">
+                <div class="metric-value">{avg_confidence}/5</div>
+                <div class="metric-label">Avg. Confidence</div>
+            </div>
+        """)
+    with col3:
+        real_correct = sum(1 for r in responses if r["ground_truth"] == "Real" and r["correct"])
+        real_total = sum(1 for r in responses if r["ground_truth"] == "Real")
+        ai_correct = sum(1 for r in responses if r["ground_truth"] == "AI-generated" and r["correct"])
+        ai_total = sum(1 for r in responses if r["ground_truth"] == "AI-generated")
+        real_pct = round((real_correct/real_total)*100) if real_total else 0
+        ai_pct = round((ai_correct/ai_total)*100) if ai_total else 0
+        st.html(f"""
+            <div class="metric-card">
+                <div class="metric-value">R:{real_pct}% / A:{ai_pct}%</div>
+                <div class="metric-label">Accuracy by type (Real / AI)</div>
+            </div>
+        """)
+
+    _, center, _ = st.columns([0.45, 2.2, 0.45])
+    with center:
+        st.image("media/ai_demos.png", use_container_width=True)
+
+    st.html("""
+        <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
+            Thank you for participating in this synthetic media study.
+        </div>
+    """)
+
+    st.html("""
+        <div class="review-title">Review your answers</div>
+        <div class="review-subtitle">
+            Open a round to see the media again and compare your answer with the correct one.
+        </div>
+    """)
+
+    for response in responses:
+        round_idx = response["round"] - 1
+        round_data = ROUNDS[round_idx]
+        icon = "✅" if response["correct"] else "❌"
+        result_text = "Correct" if response["correct"] else "Incorrect"
+        expander_title = f"{icon} Round {response['round']} — {result_text}"
+
+        with st.expander(expander_title):
+            if round_data["type"] == "single_video":
+                _, col, _ = st.columns([1.2, 1.4, 1.2])
+                with col:
+                    if media_file_exists(round_data["file"]):
+                        st.video(round_data["file"])
+                    else:
+                        st.warning("Media file not found.")
+            elif round_data["type"] == "pair_video":
+                c1, c2 = st.columns(2, gap="large")
+                with c1:
+                    st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800;'>LEFT</div>")
+                    if media_file_exists(round_data["left"]):
+                        st.video(round_data["left"])
+                    else:
+                        st.warning("File missing")
+                with c2:
+                    st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800;'>RIGHT</div>")
+                    if media_file_exists(round_data["right"]):
+                        st.video(round_data["right"])
+                    else:
+                        st.warning("File missing")
+            elif round_data["type"] == "pair_image":
+                c1, c2 = st.columns(2, gap="large")
+                with c1:
+                    st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800;'>LEFT</div>")
+                    if media_file_exists(round_data["left"]):
+                        st.image(round_data["left"], use_container_width=True)
+                    else:
+                        st.warning("File missing")
+                with c2:
+                    st.html(f"<div style='text-align:center; color:{PURPLE}; font-weight:800;'>RIGHT</div>")
+                    if media_file_exists(round_data["right"]):
+                        st.image(round_data["right"], use_container_width=True)
+                    else:
+                        st.warning("File missing")
+
+            st.write("")
+            if response["correct"]:
+                st.html(f"""
+                    <div class="correct-box">
+                        <strong>✅ Correct</strong><br><br>
+                        Your answer: <strong>{response["answer"]}</strong><br>
+                        Correct answer: <strong>{response["ground_truth"]}</strong><br>
+                        Confidence: <strong>{response["confidence"]}/5</strong>
+                    </div>
+                """)
+            else:
+                st.html(f"""
+                    <div class="incorrect-box">
+                        <strong>❌ Incorrect</strong><br><br>
+                        Your answer: <strong>{response["answer"]}</strong><br>
+                        Correct answer: <strong>{response["ground_truth"]}</strong><br>
+                        Confidence: <strong>{response["confidence"]}/5</strong>
+                    </div>
+                """)
+            if round_data["notes"] == "edited_non_ai":
+                st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI‑generated.")
+
+    render_leaderboard()
+
+    st.write("")
+    _, restart_col, _ = st.columns([1.4, 1, 1.4])
+    with restart_col:
+        if st.button("Restart Quiz", use_container_width=True):
+            restart_quiz()
+
+
+# ==================================================
+# MAIN APP
+# ==================================================
+
+def main():
+    inject_custom_css()
+    init_session_state()
+
+    if not st.session_state.started:
+        render_start_screen()
+    elif st.session_state.current_round < len(ROUNDS):
+        render_round()
+    elif not st.session_state.post_quiz_answered:
+        render_post_quiz()
+    else:
+        render_results()
+
+
+if __name__ == "__main__":
+    main()
