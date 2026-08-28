@@ -6,7 +6,7 @@ import uuid
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 # ==================================================
 # PAGE CONFIG
@@ -34,7 +34,23 @@ GREEN = "#248A57"
 RED = "#B33A3A"
 
 # ==================================================
-# CSS – Enhanced Design (with fix for top clipping)
+# SUPABASE CLIENT (if secrets available)
+# ==================================================
+
+try:
+    from supabase import create_client, Client
+    supabase: Optional[Client] = None
+    if "SUPABASE_URL" in st.secrets and "SUPABASE_KEY" in st.secrets:
+        supabase = create_client(
+            st.secrets["SUPABASE_URL"],
+            st.secrets["SUPABASE_KEY"]
+        )
+except ImportError:
+    supabase = None
+    st.warning("Supabase paketi yüklü değil. pip install supabase")
+
+# ==================================================
+# CSS – Enhanced Design
 # ==================================================
 
 def inject_custom_css():
@@ -418,8 +434,23 @@ def validate_round_media(round_data: Dict[str, Any]) -> List[str]:
     return missing
 
 
+def insert_response_to_supabase(row: Dict[str, Any]):
+    """Insert a single response row into Supabase."""
+    if supabase is None:
+        return
+    try:
+        # Convert boolean to string for 'correct' field
+        row_copy = row.copy()
+        if isinstance(row_copy["correct"], bool):
+            row_copy["correct"] = str(row_copy["correct"])
+        # Post-quiz entries have empty ground_truth etc.
+        supabase.table("responses").insert(row_copy).execute()
+    except Exception as e:
+        st.warning(f"Supabase insert error: {e}")
+
+
 def save_results():
-    """Append current session responses to CSV."""
+    """Append current session responses to CSV and Supabase."""
     os.makedirs("data", exist_ok=True)
     columns = [
         "participant_name", "participant_id", "timestamp",
@@ -428,14 +459,20 @@ def save_results():
         "response_time_seconds"
     ]
     df = pd.DataFrame(st.session_state.responses, columns=columns)
+    
+    # Write to CSV (fallback)
     if os.path.exists(RESULT_FILE):
         df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
     else:
         df.to_csv(RESULT_FILE, index=False)
+    
+    # Insert each row to Supabase
+    for _, row in df.iterrows():
+        insert_response_to_supabase(row.to_dict())
 
 
 def save_post_quiz():
-    """Save the two post‑quiz answers as a special round (round=0)."""
+    """Save post‑quiz answers to CSV and Supabase."""
     if not st.session_state.post_quiz_responses:
         return
     os.makedirs("data", exist_ok=True)
@@ -453,11 +490,29 @@ def save_post_quiz():
         "confidence": 0,
         "response_time_seconds": 0
     }
+    # Write to CSV
     df = pd.DataFrame([row])
     if os.path.exists(RESULT_FILE):
         df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
     else:
         df.to_csv(RESULT_FILE, index=False)
+    # Insert to Supabase
+    insert_response_to_supabase(row)
+
+
+def get_all_responses() -> pd.DataFrame:
+    """Fetch all responses from CSV (fallback) or Supabase if available."""
+    if supabase is not None:
+        try:
+            res = supabase.table("responses").select("*").execute()
+            if res.data:
+                return pd.DataFrame(res.data)
+        except Exception as e:
+            st.warning(f"Supabase fetch error: {e}")
+    # Fallback to CSV
+    if os.path.exists(RESULT_FILE):
+        return pd.read_csv(RESULT_FILE)
+    return pd.DataFrame()
 
 
 def restart_quiz():
@@ -707,18 +762,28 @@ def render_post_quiz():
     """)
 
     with st.container(border=True):
-        q1 = st.slider(
+        # Radio buttons instead of sliders – forcing explicit choice
+        q1 = st.radio(
             "After this quiz, do you feel more skeptical about content you see online?",
-            min_value=1, max_value=5, value=3,
-            help="1 = Not at all, 5 = Very skeptical"
+            options=[1, 2, 3, 4, 5],
+            index=None,
+            horizontal=True,
+            format_func=lambda x: f"{x} — {'Not at all' if x==1 else 'Very skeptical' if x==5 else ''}",
+            key="post_q1"
         )
-        q2 = st.slider(
+        q2 = st.radio(
             "Do you think frequent exposure to AI-generated content makes it harder to trust real content?",
-            min_value=1, max_value=5, value=3,
-            help="1 = Strongly disagree, 5 = Strongly agree"
+            options=[1, 2, 3, 4, 5],
+            index=None,
+            horizontal=True,
+            format_func=lambda x: f"{x} — {'Strongly disagree' if x==1 else 'Strongly agree' if x==5 else ''}",
+            key="post_q2"
         )
 
         if st.button("Submit feedback", type="primary", use_container_width=True):
+            if q1 is None or q2 is None:
+                st.warning("Please answer both questions before submitting.")
+                return
             st.session_state.post_quiz_responses = {
                 "skepticism": q1,
                 "trust_harder": q2
@@ -730,22 +795,25 @@ def render_post_quiz():
 
 def render_leaderboard():
     """Display a leaderboard of all participants who completed all rounds."""
-    if not os.path.exists(RESULT_FILE):
+    df = get_all_responses()
+    if df.empty:
         st.info("No data yet – be the first to complete the quiz!")
         return
 
-    df = pd.read_csv(RESULT_FILE)
+    # Filter only regular rounds (round > 0)
     df_rounds = df[df["round"] > 0]
     if df_rounds.empty:
         st.info("No quiz data found yet.")
         return
 
+    # Group by participant_id
     grouped = df_rounds.groupby("participant_id").agg(
         participant_name=("participant_name", "first"),
         total_rounds=("round", "count"),
-        correct=("correct", "sum")
+        correct=("correct", lambda x: (x == "True").sum() if x.dtype == object else x.sum())
     ).reset_index()
 
+    # Keep only those with all 9 rounds
     grouped = grouped[grouped["total_rounds"] == len(ROUNDS)]
     if grouped.empty:
         st.info("No complete quiz records yet.")
@@ -753,7 +821,9 @@ def render_leaderboard():
 
     grouped["accuracy"] = (grouped["correct"] / len(ROUNDS) * 100).round(1)
     grouped = grouped.sort_values("correct", ascending=False).reset_index(drop=True)
-    grouped.index = grouped.index + 1
+
+    # Dense ranking: same score gets same rank
+    grouped["rank"] = grouped["correct"].rank(method="dense", ascending=False).astype(int)
 
     st.html("""
         <div style="margin-top: 2.5rem; text-align:center;">
@@ -773,8 +843,8 @@ def render_leaderboard():
         </thead>
         <tbody>
     """
-    for idx, row in grouped.iterrows():
-        rank = idx
+    for _, row in grouped.iterrows():
+        rank = row["rank"]
         name = row["participant_name"]
         correct = int(row["correct"])
         acc = row["accuracy"]
@@ -831,16 +901,18 @@ def render_results():
             </div>
         """)
     with col3:
-        real_correct = sum(1 for r in responses if r["ground_truth"] == "Real" and r["correct"])
-        real_total = sum(1 for r in responses if r["ground_truth"] == "Real")
-        ai_correct = sum(1 for r in responses if r["ground_truth"] == "AI-generated" and r["correct"])
-        ai_total = sum(1 for r in responses if r["ground_truth"] == "AI-generated")
+        # Only single-video rounds have ground_truth "Real" or "AI-generated"
+        single_responses = [r for r in responses if r["ground_truth"] in ("Real", "AI-generated")]
+        real_correct = sum(1 for r in single_responses if r["ground_truth"] == "Real" and r["correct"])
+        real_total = sum(1 for r in single_responses if r["ground_truth"] == "Real")
+        ai_correct = sum(1 for r in single_responses if r["ground_truth"] == "AI-generated" and r["correct"])
+        ai_total = sum(1 for r in single_responses if r["ground_truth"] == "AI-generated")
         real_pct = round((real_correct/real_total)*100) if real_total else 0
         ai_pct = round((ai_correct/ai_total)*100) if ai_total else 0
         st.html(f"""
             <div class="metric-card">
                 <div class="metric-value">R:{real_pct}% / A:{ai_pct}%</div>
-                <div class="metric-label">Accuracy by type (Real / AI)</div>
+                <div class="metric-label">Single‑video accuracy — Real / AI</div>
             </div>
         """)
 
