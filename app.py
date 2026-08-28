@@ -794,42 +794,153 @@ def render_post_quiz():
 
 
 def render_leaderboard():
-    """Display a leaderboard of all participants who completed all rounds."""
+    """Display leaderboard safely for CSV and Supabase data."""
+
     df = get_all_responses()
+
     if df.empty:
         st.info("No data yet – be the first to complete the quiz!")
         return
 
-    # Filter only regular rounds (round > 0)
-    df_rounds = df[df["round"] > 0]
+    # Make sure round is numeric
+    df["round"] = pd.to_numeric(
+        df["round"],
+        errors="coerce"
+    )
+
+    # Only actual quiz rounds
+    df_rounds = df[
+        (df["round"] >= 1) &
+        (df["round"] <= len(ROUNDS))
+    ].copy()
+
     if df_rounds.empty:
         st.info("No quiz data found yet.")
         return
 
-    # Group by participant_id
-    grouped = df_rounds.groupby("participant_id").agg(
-        participant_name=("participant_name", "first"),
-        total_rounds=("round", "count"),
-        correct=("correct", lambda x: (x == "True").sum() if x.dtype == object else x.sum())
-    ).reset_index()
+    # ----------------------------------------------
+    # NORMALIZE CORRECT COLUMN
+    # Handles:
+    # True / False
+    # "True" / "False"
+    # "true" / "false"
+    # 1 / 0
+    # Arrow string dtype
+    # ----------------------------------------------
 
-    # Keep only those with all 9 rounds
-    grouped = grouped[grouped["total_rounds"] == len(ROUNDS)]
+    def correct_to_int(value):
+
+        if pd.isna(value):
+            return 0
+
+        if isinstance(value, bool):
+            return int(value)
+
+        text = str(value).strip().lower()
+
+        if text in ["true", "1", "yes"]:
+            return 1
+
+        return 0
+
+    df_rounds["correct_num"] = (
+        df_rounds["correct"]
+        .apply(correct_to_int)
+        .astype(int)
+    )
+
+    # ----------------------------------------------
+    # GROUP PARTICIPANTS
+    # ----------------------------------------------
+
+    grouped = (
+        df_rounds
+        .groupby("participant_id")
+        .agg(
+            participant_name=(
+                "participant_name",
+                "first"
+            ),
+
+            # nunique is safer than count
+            total_rounds=(
+                "round",
+                "nunique"
+            ),
+
+            correct=(
+                "correct_num",
+                "sum"
+            )
+        )
+        .reset_index()
+    )
+
+    # Only people who completed all 9 rounds
+    grouped = grouped[
+        grouped["total_rounds"] == len(ROUNDS)
+    ].copy()
+
     if grouped.empty:
         st.info("No complete quiz records yet.")
         return
 
-    grouped["accuracy"] = (grouped["correct"] / len(ROUNDS) * 100).round(1)
-    grouped = grouped.sort_values("correct", ascending=False).reset_index(drop=True)
+    # Explicit numeric conversion
+    grouped["correct"] = pd.to_numeric(
+        grouped["correct"],
+        errors="coerce"
+    ).fillna(0).astype(int)
 
-    # Dense ranking: same score gets same rank
-    grouped["rank"] = grouped["correct"].rank(method="dense", ascending=False).astype(int)
+    grouped["accuracy"] = (
+        grouped["correct"]
+        / len(ROUNDS)
+        * 100
+    ).round(1)
 
-    st.html("""
-        <div style="margin-top: 2.5rem; text-align:center;">
-            <span style="font-size:1.5rem; font-weight:800; color:#6C2E8B;">🏆 Leaderboard</span>
+    # Highest score first
+    grouped = grouped.sort_values(
+        ["correct", "participant_name"],
+        ascending=[False, True]
+    ).reset_index(drop=True)
+
+    # Same score = same rank
+    grouped["rank"] = (
+        grouped["correct"]
+        .rank(
+            method="dense",
+            ascending=False
+        )
+        .astype(int)
+    )
+
+    # ----------------------------------------------
+    # DISPLAY
+    # ----------------------------------------------
+
+    st.html(
+        """
+        <div style="
+            margin-top:2.5rem;
+            text-align:center;
+        ">
+            <span style="
+                font-size:1.5rem;
+                font-weight:800;
+                color:#6C2E8B;
+            ">
+                🏆 Leaderboard
+            </span>
+
+            <div style="
+                font-size:0.85rem;
+                opacity:0.6;
+                margin-top:0.3rem;
+            ">
+                Just for fun — not used in the research analysis.
+            </div>
         </div>
-    """)
+        """
+    )
 
     table_html = """
     <table class="leaderboard-table">
@@ -843,21 +954,47 @@ def render_leaderboard():
         </thead>
         <tbody>
     """
+
     for _, row in grouped.iterrows():
-        rank = row["rank"]
-        name = row["participant_name"]
+
+        rank = int(row["rank"])
+        name = str(row["participant_name"])
         correct = int(row["correct"])
-        acc = row["accuracy"]
+        acc = float(row["accuracy"])
+
+        # Medal for top 3
+        if rank == 1:
+            rank_display = "🥇 #1"
+        elif rank == 2:
+            rank_display = "🥈 #2"
+        elif rank == 3:
+            rank_display = "🥉 #3"
+        else:
+            rank_display = f"#{rank}"
+
         table_html += f"""
-            <tr>
-                <td class="leaderboard-rank">#{rank}</td>
-                <td>{name}</td>
-                <td>{correct}/{len(ROUNDS)}</td>
-                <td>{acc}%</td>
-            </tr>
+        <tr>
+            <td class="leaderboard-rank">
+                {rank_display}
+            </td>
+            <td>
+                {name}
+            </td>
+            <td>
+                {correct}/{len(ROUNDS)}
+            </td>
+            <td>
+                {acc:.1f}%
+            </td>
+        </tr>
         """
-    table_html += "</tbody></table>"
-    st.markdown(table_html, unsafe_allow_html=True)
+
+    table_html += """
+        </tbody>
+    </table>
+    """
+
+    st.html(table_html)
 
 
 def render_results():
