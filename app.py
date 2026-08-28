@@ -14,7 +14,6 @@ from typing import Dict, List, Any, Optional
 
 st.set_page_config(
     page_title="Real or AI?",
-    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -34,7 +33,7 @@ GREEN = "#248A57"
 RED = "#B33A3A"
 
 # ==================================================
-# SUPABASE CLIENT
+# SUPABASE CLIENT (if secrets available)
 # ==================================================
 
 try:
@@ -47,10 +46,10 @@ try:
         )
 except ImportError:
     supabase = None
-    st.warning("Supabase paketi yüklü değil. pip install supabase-py")
+    st.warning("Supabase paketi yüklü değil. pip install supabase")
 
 # ==================================================
-# CSS – Enhanced Design
+# CSS - Enhanced Design
 # ==================================================
 
 def inject_custom_css():
@@ -113,20 +112,6 @@ def inject_custom_css():
                 border-radius: 100px;
                 background: {PURPLE};
                 margin: 1rem auto 1.5rem auto;
-            }}
-
-            .intro-text {{
-                max-width: 720px;
-                margin: 0 auto 2rem auto;
-                text-align: left;
-                font-size: 0.98rem;
-                line-height: 1.7;
-                opacity: 0.85;
-                padding: 0 1rem;
-            }}
-
-            .intro-text strong {{
-                color: {PURPLE};
             }}
 
             .round-label {{
@@ -327,10 +312,6 @@ def inject_custom_css():
                 .metric-value {{
                     font-size: 1.6rem;
                 }}
-                .intro-text {{
-                    font-size: 0.9rem;
-                    padding: 0 0.5rem;
-                }}
             }}
         </style>
         """
@@ -424,7 +405,8 @@ def init_session_state():
         "round_start_time": None,
         "saved": False,
         "post_quiz_answered": False,
-        "post_quiz_responses": {}
+        "post_quiz_responses": {},
+        "last_scroll_key": None
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -453,18 +435,22 @@ def validate_round_media(round_data: Dict[str, Any]) -> List[str]:
 
 
 def insert_response_to_supabase(row: Dict[str, Any]):
+    """Insert a single response row into Supabase."""
     if supabase is None:
         return
     try:
+        # Convert boolean to string for 'correct' field
         row_copy = row.copy()
         if isinstance(row_copy["correct"], bool):
             row_copy["correct"] = str(row_copy["correct"])
+        # Post-quiz entries have empty ground_truth etc.
         supabase.table("responses").insert(row_copy).execute()
     except Exception as e:
         st.warning(f"Supabase insert error: {e}")
 
 
 def save_results():
+    """Append current session responses to CSV and Supabase."""
     os.makedirs("data", exist_ok=True)
     columns = [
         "participant_name", "participant_id", "timestamp",
@@ -474,16 +460,19 @@ def save_results():
     ]
     df = pd.DataFrame(st.session_state.responses, columns=columns)
     
+    # Write to CSV (fallback)
     if os.path.exists(RESULT_FILE):
         df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
     else:
         df.to_csv(RESULT_FILE, index=False)
     
+    # Insert each row to Supabase
     for _, row in df.iterrows():
         insert_response_to_supabase(row.to_dict())
 
 
 def save_post_quiz():
+    """Save post-quiz answers to CSV and Supabase."""
     if not st.session_state.post_quiz_responses:
         return
     os.makedirs("data", exist_ok=True)
@@ -501,15 +490,18 @@ def save_post_quiz():
         "confidence": 0,
         "response_time_seconds": 0
     }
+    # Write to CSV
     df = pd.DataFrame([row])
     if os.path.exists(RESULT_FILE):
         df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
     else:
         df.to_csv(RESULT_FILE, index=False)
+    # Insert to Supabase
     insert_response_to_supabase(row)
 
 
 def get_all_responses() -> pd.DataFrame:
+    """Fetch all responses from CSV (fallback) or Supabase if available."""
     if supabase is not None:
         try:
             res = supabase.table("responses").select("*").execute()
@@ -517,6 +509,7 @@ def get_all_responses() -> pd.DataFrame:
                 return pd.DataFrame(res.data)
         except Exception as e:
             st.warning(f"Supabase fetch error: {e}")
+    # Fallback to CSV
     if os.path.exists(RESULT_FILE):
         return pd.read_csv(RESULT_FILE)
     return pd.DataFrame()
@@ -528,11 +521,17 @@ def restart_quiz():
     st.rerun()
 
 
-def scroll_to_top():
+def scroll_to_top_once(page_key: str):
+    """Scroll to the top once when the user moves to a new page or round."""
+    if st.session_state.get("last_scroll_key") == page_key:
+        return
+
+    st.session_state["last_scroll_key"] = page_key
+
     st.components.v1.html(
         """
         <script>
-            window.scrollTo(0, 0);
+            window.parent.scrollTo(0, 0);
         </script>
         """,
         height=0,
@@ -547,81 +546,77 @@ def render_hero():
     st.html(
         """
         <div class="hero">
-            <div class="hero-badge">AI DeMoS Lab • TU Delft</div>
-            <div class="hero-title">🤖 Real or AI?</div>
+            <div class="hero-badge">AI DeMoS Lab - TU Delft</div>
+            <div class="hero-title">Real or AI?</div>
             <div class="purple-line"></div>
             <div class="hero-subtitle">
-                Can you tell the difference between authentic,
-                traditionally edited and AI‑generated media?
+                A short study about how we judge real, edited and AI-generated media online.
             </div>
-        </div>
-        """
-    )
-
-
-def render_intro():
-    st.html(
-        """
-        <div class="intro-text">
-            <p>
-                <strong>Why this quiz?</strong>
-            </p>
-            <p>
-                A few years ago, many feared that deepfakes would be used to
-                manipulate political elections. That didn't really happen.
-                Instead, synthetic media quietly entered our lives through
-                social media feeds – AI‑generated images, videos, and audio
-                that we scroll past every day without a second thought.
-            </p>
-            <p>
-                This quiz is a small experiment to understand how well we can
-                spot synthetic content in the wild. No research agenda, no
-                hidden goal – just curiosity about how our eyes and instincts
-                deal with the new normal of the internet.
-            </p>
-            <p style="font-size:0.9rem; opacity:0.6; margin-top:0.5rem;">
-                Inspired by a conversation with Jordi about how synthetic
-                media – mixed with the endless scroll – is shaping the way
-                we experience reality online.
-            </p>
         </div>
         """
     )
 
 
 def render_start_screen():
-    scroll_to_top()
+    scroll_to_top_once("start")
     render_hero()
-    render_intro()
-    
+
+    # Short introduction
+    with st.container(border=True):
+        st.markdown(
+            """
+### Why this study?
+
+A lot of the early discussion around AI-generated media focused on political deepfakes and the idea that they could strongly manipulate public opinion. That did not always play out as dramatically as expected.
+
+At the same time, AI-generated content became much more common in everyday social media feeds. After talking about this with Jordi at the DeMoS Lab, I became more interested in this everyday kind of exposure - people scrolling past real, edited and AI-generated content mixed together.
+
+This short study looks at how people judge those different kinds of media.
+            """
+        )
+
+    st.write("")
+
     col_left, col_center, col_right = st.columns([0.55, 2.2, 0.55])
     with col_center:
         st.image("media/demos_lab.png", use_container_width=True)
+
     st.write("")
-    
+
     with st.container(border=True):
         st.html(f"""
             <div style="color:{PURPLE}; font-weight:800; font-size:1.4rem; margin-bottom:0.7rem;">
-                Ready to play?
+                How it works
             </div>
         """)
-        st.markdown("""
-            You will see **9 pieces of media**.
 
-            Your task is simple:  
-            **Decide whether the content is real or AI‑generated.**
+        st.markdown(
+            """
+You will see **9 pieces of media**.
 
-            For some rounds, you will compare two pieces of media.
+For each one, choose whether you think it is real or AI-generated and tell us how confident you are.
 
-            After each answer, tell us how confident you are.
+Some rounds show two items side by side. Go with your own judgement.
 
-            **Estimated time: 4–6 minutes.**
-        """)
+**Estimated time: 4-6 minutes.**
+            """
+        )
+
         with st.form("start_form"):
-            name = st.text_input("Enter your name or nickname", placeholder="e.g. Umut")
-            submitted = st.form_submit_button("Start Quiz →", type="primary", use_container_width=True)
+            name = st.text_input(
+                "Enter your name or nickname",
+                placeholder="e.g. Umut"
+            )
+
+            submitted = st.form_submit_button(
+                "Start",
+                type="primary",
+                use_container_width=True
+            )
+
             if submitted:
                 cleaned = " ".join(name.split())
+
                 if not cleaned:
                     st.warning("Please enter your name or nickname.")
                 else:
@@ -636,9 +631,7 @@ def render_start_screen():
                     st.session_state.post_quiz_responses = {}
                     st.rerun()
 
-
 def render_single_video(round_data: Dict[str, Any]):
-    scroll_to_top()
     with st.container(border=True):
         missing = validate_round_media(round_data)
         if missing:
@@ -648,8 +641,8 @@ def render_single_video(round_data: Dict[str, Any]):
         with center:
             st.video(round_data["file"])
         st.html("""
-            <div class="question-heading">Is this video AI‑generated?</div>
-            <div class="question-subheading">Trust your first impression.</div>
+            <div class="question-heading">Is this video AI-generated?</div>
+            <div class="question-subheading">Go with your first impression.</div>
         """)
         return st.radio(
             "Answer",
@@ -662,17 +655,16 @@ def render_single_video(round_data: Dict[str, Any]):
 
 
 def render_pair_video(round_data: Dict[str, Any]):
-    scroll_to_top()
     missing = validate_round_media(round_data)
     if missing:
         st.warning(f"⚠️ Media file(s) missing: {', '.join(missing)}")
         return
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-size:1.4rem; font-weight:800;">
-            Which video is AI‑generated?
+            Which video is AI-generated?
         </div>
         <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
-            One of these videos is AI‑generated.
+            One of these videos is AI-generated.
         </div>
     """)
     left_col, right_col = st.columns(2, gap="large")
@@ -685,7 +677,7 @@ def render_pair_video(round_data: Dict[str, Any]):
     st.write("")
     with st.container(border=True):
         return st.radio(
-            "Which video is AI‑generated?",
+            "Which video is AI-generated?",
             ["Left", "Right", "Not sure"],
             index=None,
             horizontal=True,
@@ -694,17 +686,16 @@ def render_pair_video(round_data: Dict[str, Any]):
 
 
 def render_pair_image(round_data: Dict[str, Any]):
-    scroll_to_top()
     missing = validate_round_media(round_data)
     if missing:
         st.warning(f"⚠️ Image file(s) missing: {', '.join(missing)}")
         return
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-size:1.4rem; font-weight:800;">
-            Final challenge: TU Delft
+            TU Delft image comparison
         </div>
         <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
-            One image is authentic. The other is AI‑generated.
+            One image is authentic. The other is AI-generated.
         </div>
     """)
     left_col, right_col = st.columns(2, gap="large")
@@ -717,7 +708,7 @@ def render_pair_image(round_data: Dict[str, Any]):
     st.write("")
     with st.container(border=True):
         return st.radio(
-            "Which image is AI‑generated?",
+            "Which image is AI-generated?",
             ["Left", "Right", "Not sure"],
             index=None,
             horizontal=True,
@@ -728,6 +719,8 @@ def render_pair_image(round_data: Dict[str, Any]):
 def render_round():
     round_num = st.session_state.current_round
     round_data = ROUNDS[round_num]
+
+    scroll_to_top_once(f"round_{round_num}")
 
     st.html(f'<div class="round-label">ROUND {round_num + 1} OF {len(ROUNDS)}</div>')
     st.progress((round_num + 1) / len(ROUNDS))
@@ -748,7 +741,7 @@ def render_round():
         st.html("""
             <div class="question-heading">How confident are you?</div>
             <div class="question-subheading">
-                1 = pure guess &nbsp;&nbsp;•&nbsp;&nbsp; 5 = very confident
+                1 = pure guess &nbsp;&nbsp;|&nbsp;&nbsp; 5 = very confident
             </div>
         """)
         _, slider_col, _ = st.columns([0.3, 3, 0.3])
@@ -795,104 +788,224 @@ def render_round():
 
 
 def render_post_quiz():
-    scroll_to_top()
+    """Show two extra questions as a separate page."""
+
+    # Save the 9 quiz responses before asking the final questions.
+    # This way the main study data is not lost if someone closes the page here.
+    if not st.session_state.saved:
+        save_results()
+        st.session_state.saved = True
+
+    scroll_to_top_once("post_quiz")
+
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
-            A few final questions
+            Two quick questions
         </div>
         <div style="text-align:center; opacity:0.7; margin-bottom:1.5rem;">
-            Your honest feedback helps our research.
+            Answer these before you see your results.
         </div>
     """)
 
+    scale_options = [
+        "Strongly disagree",
+        "Disagree",
+        "In between",
+        "Agree",
+        "Strongly agree"
+    ]
+
+    scale_to_number = {
+        "Strongly disagree": 1,
+        "Disagree": 2,
+        "In between": 3,
+        "Agree": 4,
+        "Strongly agree": 5
+    }
+
     with st.container(border=True):
         q1 = st.radio(
-            "After this quiz, do you feel more skeptical about content you see online?",
-            options=[1, 2, 3, 4, 5],
+            "After this quiz, I feel more skeptical about content I see online.",
+            options=scale_options,
             index=None,
             horizontal=True,
-            format_func=lambda x: {
-                1: "1 - Not at all",
-                2: "2 - Slightly",
-                3: "3 - Moderately",
-                4: "4 - Very",
-                5: "5 - Extremely"
-            }[x],
             key="post_q1"
         )
+
+        st.write("")
+
         q2 = st.radio(
-            "Do you think frequent exposure to AI‑generated content makes it harder to trust real content?",
-            options=[1, 2, 3, 4, 5],
+            "Frequent exposure to AI-generated content makes it harder to trust real content.",
+            options=scale_options,
             index=None,
             horizontal=True,
-            format_func=lambda x: {
-                1: "1 - Strongly disagree",
-                2: "2 - Disagree",
-                3: "3 - Neutral",
-                4: "4 - Agree",
-                5: "5 - Strongly agree"
-            }[x],
             key="post_q2"
         )
 
-        if st.button("Submit feedback", type="primary", use_container_width=True):
+        if st.button(
+            "See my results",
+            type="primary",
+            use_container_width=True
+        ):
             if q1 is None or q2 is None:
-                st.warning("Please answer both questions before submitting.")
+                st.warning("Please answer both questions before continuing.")
                 return
+
             st.session_state.post_quiz_responses = {
-                "skepticism": q1,
-                "trust_harder": q2
+                "skepticism": scale_to_number[q1],
+                "skepticism_label": q1,
+                "trust_harder": scale_to_number[q2],
+                "trust_harder_label": q2
             }
+
             save_post_quiz()
             st.session_state.post_quiz_answered = True
             st.rerun()
 
-
 def render_leaderboard():
+    """Display leaderboard safely for CSV and Supabase data."""
+
     df = get_all_responses()
+
     if df.empty:
-        st.info("No data yet – be the first to complete the quiz!")
+        st.info("No data yet.")
         return
 
-    df["round"] = pd.to_numeric(df["round"], errors="coerce")
-    df_rounds = df[(df["round"] >= 1) & (df["round"] <= len(ROUNDS))].copy()
+    # Make sure round is numeric
+    df["round"] = pd.to_numeric(
+        df["round"],
+        errors="coerce"
+    )
+
+    # Only actual quiz rounds
+    df_rounds = df[
+        (df["round"] >= 1) &
+        (df["round"] <= len(ROUNDS))
+    ].copy()
+
     if df_rounds.empty:
         st.info("No quiz data found yet.")
         return
 
+    # ----------------------------------------------
+    # NORMALIZE CORRECT COLUMN
+    # Handles:
+    # True / False
+    # "True" / "False"
+    # "true" / "false"
+    # 1 / 0
+    # Arrow string dtype
+    # ----------------------------------------------
+
     def correct_to_int(value):
+
         if pd.isna(value):
             return 0
+
         if isinstance(value, bool):
             return int(value)
+
         text = str(value).strip().lower()
+
         if text in ["true", "1", "yes"]:
             return 1
+
         return 0
 
-    df_rounds["correct_num"] = df_rounds["correct"].apply(correct_to_int).astype(int)
-    grouped = df_rounds.groupby("participant_id").agg(
-        participant_name=("participant_name", "first"),
-        total_rounds=("round", "nunique"),
-        correct=("correct_num", "sum")
-    ).reset_index()
+    df_rounds["correct_num"] = (
+        df_rounds["correct"]
+        .apply(correct_to_int)
+        .astype(int)
+    )
 
-    grouped = grouped[grouped["total_rounds"] == len(ROUNDS)].copy()
+    # ----------------------------------------------
+    # GROUP PARTICIPANTS
+    # ----------------------------------------------
+
+    grouped = (
+        df_rounds
+        .groupby("participant_id")
+        .agg(
+            participant_name=(
+                "participant_name",
+                "first"
+            ),
+
+            # nunique is safer than count
+            total_rounds=(
+                "round",
+                "nunique"
+            ),
+
+            correct=(
+                "correct_num",
+                "sum"
+            )
+        )
+        .reset_index()
+    )
+
+    # Only people who completed all 9 rounds
+    grouped = grouped[
+        grouped["total_rounds"] == len(ROUNDS)
+    ].copy()
+
     if grouped.empty:
         st.info("No complete quiz records yet.")
         return
 
-    grouped["correct"] = pd.to_numeric(grouped["correct"], errors="coerce").fillna(0).astype(int)
-    grouped["accuracy"] = (grouped["correct"] / len(ROUNDS) * 100).round(1)
-    grouped = grouped.sort_values(["correct", "participant_name"], ascending=[False, True]).reset_index(drop=True)
-    grouped["rank"] = grouped["correct"].rank(method="dense", ascending=False).astype(int)
+    # Explicit numeric conversion
+    grouped["correct"] = pd.to_numeric(
+        grouped["correct"],
+        errors="coerce"
+    ).fillna(0).astype(int)
+
+    grouped["accuracy"] = (
+        grouped["correct"]
+        / len(ROUNDS)
+        * 100
+    ).round(1)
+
+    # Highest score first
+    grouped = grouped.sort_values(
+        ["correct", "participant_name"],
+        ascending=[False, True]
+    ).reset_index(drop=True)
+
+    # Same score = same rank
+    grouped["rank"] = (
+        grouped["correct"]
+        .rank(
+            method="dense",
+            ascending=False
+        )
+        .astype(int)
+    )
+
+    # ----------------------------------------------
+    # DISPLAY
+    # ----------------------------------------------
 
     st.html(
         """
-        <div style="margin-top:2.5rem; text-align:center;">
-            <span style="font-size:1.5rem; font-weight:800; color:#6C2E8B;">🏆 Leaderboard</span>
-            <div style="font-size:0.85rem; opacity:0.6; margin-top:0.3rem;">
-                Just for fun – not used in the research analysis.
+        <div style="
+            margin-top:2.5rem;
+            text-align:center;
+        ">
+            <span style="
+                font-size:1.5rem;
+                font-weight:800;
+                color:#6C2E8B;
+            ">
+                🏆 Leaderboard
+            </span>
+
+            <div style="
+                font-size:0.85rem;
+                opacity:0.6;
+                margin-top:0.3rem;
+            ">
+                Just for fun - not used in the research analysis.
             </div>
         </div>
         """
@@ -910,11 +1023,15 @@ def render_leaderboard():
         </thead>
         <tbody>
     """
+
     for _, row in grouped.iterrows():
+
         rank = int(row["rank"])
         name = str(row["participant_name"])
         correct = int(row["correct"])
         acc = float(row["accuracy"])
+
+        # Medal for top 3
         if rank == 1:
             rank_display = "🥇 #1"
         elif rank == 2:
@@ -923,20 +1040,34 @@ def render_leaderboard():
             rank_display = "🥉 #3"
         else:
             rank_display = f"#{rank}"
+
         table_html += f"""
         <tr>
-            <td class="leaderboard-rank">{rank_display}</td>
-            <td>{name}</td>
-            <td>{correct}/{len(ROUNDS)}</td>
-            <td>{acc:.1f}%</td>
+            <td class="leaderboard-rank">
+                {rank_display}
+            </td>
+            <td>
+                {name}
+            </td>
+            <td>
+                {correct}/{len(ROUNDS)}
+            </td>
+            <td>
+                {acc:.1f}%
+            </td>
         </tr>
         """
-    table_html += "</tbody></table>"
+
+    table_html += """
+        </tbody>
+    </table>
+    """
+
     st.html(table_html)
 
 
 def render_results():
-    scroll_to_top()
+    scroll_to_top_once("results")
 
     if not st.session_state.saved:
         save_results()
@@ -949,7 +1080,7 @@ def render_results():
 
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
-            Quiz complete 🎉
+            Quiz complete
         </div>
         <div class="final-score">
             <div class="score-caption">{st.session_state.participant_name}, your score is</div>
@@ -976,6 +1107,7 @@ def render_results():
             </div>
         """)
     with col3:
+        # Only single-video rounds have ground_truth "Real" or "AI-generated"
         single_responses = [r for r in responses if r["ground_truth"] in ("Real", "AI-generated")]
         real_correct = sum(1 for r in single_responses if r["ground_truth"] == "Real" and r["correct"])
         real_total = sum(1 for r in single_responses if r["ground_truth"] == "Real")
@@ -986,7 +1118,7 @@ def render_results():
         st.html(f"""
             <div class="metric-card">
                 <div class="metric-value">R:{real_pct}% / A:{ai_pct}%</div>
-                <div class="metric-label">Single‑video accuracy – Real / AI</div>
+                <div class="metric-label">Single-video accuracy - Real / AI</div>
             </div>
         """)
 
@@ -996,7 +1128,7 @@ def render_results():
 
     st.html("""
         <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
-            Thank you for participating in this synthetic media study.
+            Thanks for taking part.
         </div>
     """)
 
@@ -1012,7 +1144,7 @@ def render_results():
         round_data = ROUNDS[round_idx]
         icon = "✅" if response["correct"] else "❌"
         result_text = "Correct" if response["correct"] else "Incorrect"
-        expander_title = f"{icon} Round {response['round']} — {result_text}"
+        expander_title = f"{icon} Round {response['round']} - {result_text}"
 
         with st.expander(expander_title):
             if round_data["type"] == "single_video":
@@ -1071,7 +1203,7 @@ def render_results():
                     </div>
                 """)
             if round_data["notes"] == "edited_non_ai":
-                st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI‑generated.")
+                st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI-generated.")
 
     render_leaderboard()
 
