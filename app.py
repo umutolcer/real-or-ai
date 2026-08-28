@@ -327,42 +327,42 @@ ROUNDS: List[Dict[str, Any]] = [
         "id": "video1",
         "type": "single_video",
         "file": "media/single/video1.mp4",
-        "ground_truth": "Real",
+        "ground_truth": "No (Not AI-generated)",
         "notes": "authentic"
     },
     {
         "id": "video2",
         "type": "single_video",
         "file": "media/single/video2.mp4",
-        "ground_truth": "AI-generated",
+        "ground_truth": "Yes (AI-generated)",
         "notes": "ai_generated"
     },
     {
         "id": "video3",
         "type": "single_video",
         "file": "media/single/video3.mp4",
-        "ground_truth": "Real",
+        "ground_truth": "No (Not AI-generated)",
         "notes": "authentic"
     },
     {
         "id": "video4",
         "type": "single_video",
         "file": "media/single/video4.mp4",
-        "ground_truth": "Real",
+        "ground_truth": "No (Not AI-generated)",
         "notes": "authentic"
     },
     {
         "id": "video5",
         "type": "single_video",
         "file": "media/single/video5.mp4",
-        "ground_truth": "AI-generated",
+        "ground_truth": "Yes (AI-generated)",
         "notes": "ai_generated"
     },
     {
         "id": "video6",
         "type": "single_video",
         "file": "media/single/video6.mp4",
-        "ground_truth": "Real",
+        "ground_truth": "No (Not AI-generated)",
         "notes": "edited_non_ai"
     },
     {
@@ -406,7 +406,7 @@ def init_session_state():
         "saved": False,
         "post_quiz_answered": False,
         "post_quiz_responses": {},
-        "last_scroll_key": None
+        "should_scroll_to_top": False
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -521,17 +521,26 @@ def restart_quiz():
     st.rerun()
 
 
-def scroll_to_top_once(page_key: str):
-    """Scroll to the top once when the user moves to a new page or round."""
-    if st.session_state.get("last_scroll_key") == page_key:
+def request_scroll_to_top():
+    """Mark that the next page/round should start at the top."""
+    st.session_state["should_scroll_to_top"] = True
+
+
+def handle_scroll_to_top():
+    """Scroll only after an explicit transition to a new page/round."""
+    if not st.session_state.get("should_scroll_to_top", False):
         return
 
-    st.session_state["last_scroll_key"] = page_key
+    st.session_state["should_scroll_to_top"] = False
 
     st.components.v1.html(
         """
         <script>
-            window.parent.scrollTo(0, 0);
+            window.parent.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: "instant"
+            });
         </script>
         """,
         height=0,
@@ -558,7 +567,6 @@ def render_hero():
 
 
 def render_start_screen():
-    scroll_to_top_once("start")
     render_hero()
 
     # Short introduction
@@ -594,7 +602,7 @@ This short study looks at how people judge those different kinds of media.
             """
 You will see **9 pieces of media**.
 
-For each one, choose whether you think it is real or AI-generated and tell us how confident you are.
+For each one, decide whether you think the content is AI-generated and tell us how confident you are.
 
 Some rounds show two items side by side. Go with your own judgement.
 
@@ -629,6 +637,7 @@ Some rounds show two items side by side. Go with your own judgement.
                     st.session_state.started = True
                     st.session_state.post_quiz_answered = False
                     st.session_state.post_quiz_responses = {}
+                    request_scroll_to_top()
                     st.rerun()
 
 def render_single_video(round_data: Dict[str, Any]):
@@ -646,7 +655,7 @@ def render_single_video(round_data: Dict[str, Any]):
         """)
         return st.radio(
             "Answer",
-            ["Real", "AI-generated", "Not sure"],
+            ["Yes (AI-generated)", "No (Not AI-generated)", "Not sure"],
             index=None,
             horizontal=True,
             label_visibility="collapsed",
@@ -720,7 +729,7 @@ def render_round():
     round_num = st.session_state.current_round
     round_data = ROUNDS[round_num]
 
-    scroll_to_top_once(f"round_{round_num}")
+    handle_scroll_to_top()
 
     st.html(f'<div class="round-label">ROUND {round_num + 1} OF {len(ROUNDS)}</div>')
     st.progress((round_num + 1) / len(ROUNDS))
@@ -784,6 +793,7 @@ def render_round():
         st.session_state.responses.append(response)
         st.session_state.current_round += 1
         st.session_state.round_start_time = time.time()
+        request_scroll_to_top()
         st.rerun()
 
 
@@ -796,7 +806,7 @@ def render_post_quiz():
         save_results()
         st.session_state.saved = True
 
-    scroll_to_top_once("post_quiz")
+    handle_scroll_to_top()
 
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
@@ -860,6 +870,7 @@ def render_post_quiz():
 
             save_post_quiz()
             st.session_state.post_quiz_answered = True
+            request_scroll_to_top()
             st.rerun()
 
 def render_leaderboard():
@@ -1067,7 +1078,7 @@ def render_leaderboard():
 
 
 def render_results():
-    scroll_to_top_once("results")
+    handle_scroll_to_top()
 
     if not st.session_state.saved:
         save_results()
@@ -1107,18 +1118,33 @@ def render_results():
             </div>
         """)
     with col3:
-        # Only single-video rounds have ground_truth "Real" or "AI-generated"
-        single_responses = [r for r in responses if r["ground_truth"] in ("Real", "AI-generated")]
-        real_correct = sum(1 for r in single_responses if r["ground_truth"] == "Real" and r["correct"])
-        real_total = sum(1 for r in single_responses if r["ground_truth"] == "Real")
-        ai_correct = sum(1 for r in single_responses if r["ground_truth"] == "AI-generated" and r["correct"])
-        ai_total = sum(1 for r in single_responses if r["ground_truth"] == "AI-generated")
-        real_pct = round((real_correct/real_total)*100) if real_total else 0
+        # Single-video rounds use Yes/No ground truth
+        single_responses = [
+            r for r in responses
+            if r["ground_truth"] in ("Yes (AI-generated)", "No (Not AI-generated)")
+        ]
+        non_ai_correct = sum(
+            1 for r in single_responses
+            if r["ground_truth"] == "No (Not AI-generated)" and r["correct"]
+        )
+        non_ai_total = sum(
+            1 for r in single_responses
+            if r["ground_truth"] == "No (Not AI-generated)"
+        )
+        ai_correct = sum(
+            1 for r in single_responses
+            if r["ground_truth"] == "Yes (AI-generated)" and r["correct"]
+        )
+        ai_total = sum(
+            1 for r in single_responses
+            if r["ground_truth"] == "Yes (AI-generated)"
+        )
+        non_ai_pct = round((non_ai_correct/non_ai_total)*100) if non_ai_total else 0
         ai_pct = round((ai_correct/ai_total)*100) if ai_total else 0
         st.html(f"""
             <div class="metric-card">
-                <div class="metric-value">R:{real_pct}% / A:{ai_pct}%</div>
-                <div class="metric-label">Single-video accuracy - Real / AI</div>
+                <div class="metric-value">No:{non_ai_pct}% / Yes:{ai_pct}%</div>
+                <div class="metric-label">Single-video accuracy - Not AI / AI</div>
             </div>
         """)
 
