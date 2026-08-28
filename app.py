@@ -328,7 +328,7 @@ ROUNDS: List[Dict[str, Any]] = [
         "id": "video1",
         "type": "single_video",
         "file": "media/single/video1.mp4",
-        "ground_truth": "No (Not AI-generated)",
+        "ground_truth": "No",
         "notes": "authentic"
     },
     {
@@ -342,14 +342,14 @@ ROUNDS: List[Dict[str, Any]] = [
         "id": "video3",
         "type": "single_video",
         "file": "media/single/video3.mp4",
-        "ground_truth": "No (Not AI-generated)",
+        "ground_truth": "No",
         "notes": "authentic"
     },
     {
         "id": "video4",
         "type": "single_video",
         "file": "media/single/video4.mp4",
-        "ground_truth": "No (Not AI-generated)",
+        "ground_truth": "No",
         "notes": "authentic"
     },
     {
@@ -363,7 +363,7 @@ ROUNDS: List[Dict[str, Any]] = [
         "id": "video6",
         "type": "single_video",
         "file": "media/single/video6.mp4",
-        "ground_truth": "No (Not AI-generated)",
+        "ground_truth": "No",
         "notes": "edited_non_ai"
     },
     {
@@ -647,7 +647,7 @@ def render_single_video(round_data: Dict[str, Any]):
         """)
         return st.radio(
             "Answer",
-            ["Yes (AI-generated)", "No (Not AI-generated)", "Not sure"],
+            ["Yes (AI-generated)", "No", "Not sure"],
             index=None,
             horizontal=True,
             label_visibility="collapsed",
@@ -1018,15 +1018,15 @@ def render_results():
     with col3:
         single_responses = [
             r for r in responses
-            if r["ground_truth"] in ("Yes (AI-generated)", "No (Not AI-generated)")
+            if r["ground_truth"] in ("Yes (AI-generated)", "No")
         ]
         non_ai_correct = sum(
             1 for r in single_responses
-            if r["ground_truth"] == "No (Not AI-generated)" and r["correct"]
+            if r["ground_truth"] == "No" and r["correct"]
         )
         non_ai_total = sum(
             1 for r in single_responses
-            if r["ground_truth"] == "No (Not AI-generated)"
+            if r["ground_truth"] == "No"
         )
         ai_correct = sum(
             1 for r in single_responses
