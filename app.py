@@ -618,10 +618,23 @@ Some rounds show two items side by side. Go with your own judgement.
             """
         )
 
+        # -------- DETECTOR NOTU (ACCURACY OLMADAN, ROBOT EMOJİSİ YOK) --------
         st.markdown(
             """
-🤖 **Also:** I tested these media with UniversalFakeDetect as a machine baseline.  
-It achieved **6/9 (66.7%)** accuracy. You can compare your answers with the detector at the end.
+**Also:** I tested these media with UniversalFakeDetect as a machine baseline.  
+You can compare your answers with the detector at the end.
+            """
+        )
+
+        # -------- CONSENT METNİ --------
+        st.markdown(
+            """
+---
+**Data use & privacy**
+
+Your answers, confidence ratings, response times and final feedback will be recorded for this research project.  
+You can use a nickname. Your nickname and score may appear on the leaderboard.  
+By starting, you agree to these responses being used for the analysis.
             """
         )
 
@@ -1060,6 +1073,7 @@ def render_results():
             </div>
         """)
 
+    # -------- MACHINE BASELINE (SADECE SONUÇTA, ORANLA BİRLİKTE) --------
     st.html(f"""
         <div style="
             text-align:center;
@@ -1071,7 +1085,7 @@ def render_results():
             border-radius: 12px;
             border: 1px solid {SOFT_PURPLE};
         ">
-            🤖 <strong>Machine baseline:</strong> 
+            <strong>Machine baseline:</strong> 
             I also tested UniversalFakeDetect on the same media. 
             It achieved <strong>6/9 (66.7%)</strong> overall accuracy.
         </div>
