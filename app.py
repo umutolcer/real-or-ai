@@ -509,6 +509,18 @@ def get_all_responses() -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def get_detector_results():
+    """Load precomputed detector results from JSON."""
+    json_path = Path("media/detector_results.json")
+    if not json_path.exists():
+        return {}
+    try:
+        with open(json_path, "r") as f:
+            return json.load(f)
+    except:
+        return {}
+
+
 def restart_quiz():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
@@ -599,6 +611,14 @@ For each one, decide whether you think the content is AI-generated and tell us h
 Some rounds show two items side by side. Go with your own judgement.
 
 **Estimated time: 4-6 minutes.**
+            """
+        )
+
+        # -------- KISA DETECTOR NOTU (GİRİŞ) --------
+        st.markdown(
+            """
+🤖 **Also:** I tested these media with UniversalFakeDetect as a machine baseline.  
+It achieved **6/9 (66.7%)** accuracy. You can compare your answers with the detector at the end.
             """
         )
 
@@ -1045,6 +1065,24 @@ def render_results():
             </div>
         """)
 
+    # -------- MACHINE BASELINE NOTU (SONUÇ) --------
+    st.html(f"""
+        <div style="
+            text-align:center;
+            font-size:0.95rem;
+            opacity:0.7;
+            margin: 1.5rem 0 1rem 0;
+            padding: 0.8rem;
+            background: {LIGHT_PURPLE};
+            border-radius: 12px;
+            border: 1px solid {SOFT_PURPLE};
+        ">
+            🤖 <strong>Machine baseline:</strong> 
+            I also tested UniversalFakeDetect on the same media. 
+            It achieved <strong>6/9 (66.7%)</strong> overall accuracy.
+        </div>
+    """)
+
     _, center, _ = st.columns([0.45, 2.2, 0.45])
     with center:
         st.image("media/ai_demos.png", use_container_width=True)
@@ -1059,8 +1097,12 @@ def render_results():
         <div class="review-title">Review your answers</div>
         <div class="review-subtitle">
             Open a round to see the media again and compare your answer with the correct one.
+            You can also see what the AI detector predicted for each piece of media.
         </div>
     """)
+
+    # Detector verilerini yükle
+    detector_data = get_detector_results()
 
     for response in responses:
         round_idx = response["round"] - 1
@@ -1127,6 +1169,35 @@ def render_results():
                 """)
             if round_data["notes"] == "edited_non_ai":
                 st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI-generated.")
+
+            # -------- AI DETECTOR TAHMİNİNİ GÖSTER --------
+            det_key = round_data["id"]
+            if det_key in detector_data:
+                det = detector_data[det_key]
+                det_icon = "✅" if det.get("correct", False) else "❌"
+                if "score" in det:  # single video
+                    st.caption(
+                        f"🤖 **AI Detector predicted:** {det['prediction']} "
+                        f"(score: {det['score']:.5f}) {det_icon}"
+                    )
+                    # Uyum kontrolü
+                    human_ans = response["answer"]
+                    det_ans = det["prediction"]
+                    # Basit eşleşme: "No" ile "No (Not AI-generated)" vs.
+                    if human_ans == det_ans:
+                        st.caption("🤝 You and the AI detector **agreed**.")
+                    else:
+                        st.caption("🤔 You and the AI detector **disagreed**.")
+                else:  # pair video
+                    st.caption(
+                        f"🤖 **AI Detector predicted:** {det['prediction']} "
+                        f"(Left: {det['left_score']:.5f}, Right: {det['right_score']:.5f}) {det_icon}"
+                    )
+                    # Uyum kontrolü (sadece Left/Right için)
+                    if det["prediction"] == response["answer"]:
+                        st.caption("🤝 You and the AI detector **agreed**.")
+                    else:
+                        st.caption("🤔 You and the AI detector **disagreed**.")
 
     render_leaderboard()
 
