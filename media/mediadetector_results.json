@@ -1,0 +1,50 @@
+{
+  "video1": {
+    "prediction": "No",
+    "score": 0.0005633795,
+    "correct": true
+  },
+  "video2": {
+    "prediction": "No",
+    "score": 0.0478825457,
+    "correct": false
+  },
+  "video3": {
+    "prediction": "No",
+    "score": 0.0033267640,
+    "correct": true
+  },
+  "video4": {
+    "prediction": "No",
+    "score": 0.0119333672,
+    "correct": true
+  },
+  "video5": {
+    "prediction": "No",
+    "score": 0.0033554364,
+    "correct": false
+  },
+  "video6": {
+    "prediction": "No",
+    "score": 0.0004765797,
+    "correct": true
+  },
+  "pair1": {
+    "prediction": "Right",
+    "left_score": 0.0003916638,
+    "right_score": 0.5035396516,
+    "correct": false
+  },
+  "pair2": {
+    "prediction": "Right",
+    "left_score": 0.0142711056,
+    "right_score": 0.1129979528,
+    "correct": true
+  },
+  "delft": {
+    "prediction": "Right",
+    "left_score": 0.0000007339,
+    "right_score": 0.0000357106,
+    "correct": true
+  }
+}
