@@ -513,7 +513,11 @@ def get_detector_results():
     """Load precomputed detector results from JSON."""
     json_path = Path("media/detector_results.json")
     if not json_path.exists():
-        return {}
+        alt_path = Path("media/mediadetector_results.json")
+        if alt_path.exists():
+            json_path = alt_path
+        else:
+            return {}
     try:
         with open(json_path, "r") as f:
             return json.load(f)
@@ -614,7 +618,6 @@ Some rounds show two items side by side. Go with your own judgement.
             """
         )
 
-        # -------- KISA DETECTOR NOTU (GİRİŞ) --------
         st.markdown(
             """
 🤖 **Also:** I tested these media with UniversalFakeDetect as a machine baseline.  
@@ -741,18 +744,12 @@ def render_round():
     round_num = st.session_state.current_round
     round_data = ROUNDS[round_num]
 
-    # Sayfa başına scroll YOK
     st.html(f'<div class="round-label">ROUND {round_num + 1} OF {len(ROUNDS)}</div>')
     st.progress((round_num + 1) / len(ROUNDS))
     st.write("")
 
-    # ----------------------------------------------
-    # FORMU BAŞLAT: Tüm soru öğeleri bu formun içinde
-    # Form submit olana kadar sayfa YENİLENMEZ
-    # ----------------------------------------------
     with st.form(key=f"quiz_form_{round_num}"):
 
-        # 1. Medya ve Ana Soruyu Göster
         if round_data["type"] == "single_video":
             answer = render_single_video(round_data)
         elif round_data["type"] == "pair_video":
@@ -763,7 +760,6 @@ def render_round():
             st.error("Unknown round type.")
             return
 
-        # 2. Güven Skalası
         st.write("")
         with st.container(border=True):
             st.html("""
@@ -781,7 +777,6 @@ def render_round():
                     key=f"confidence_{round_num}"
                 )
 
-        # 3. Submit Butonu (Bu butona basıldığında form işlenir)
         st.write("")
         _, btn_col, _ = st.columns([1.2, 1, 1.2])
         with btn_col:
@@ -791,13 +786,9 @@ def render_round():
                 use_container_width=True
             )
 
-    # ----------------------------------------------
-    # FORM İŞLENDİĞİNDE BURASI ÇALIŞIR
-    # ----------------------------------------------
     if submitted:
         if answer is None:
             st.warning("Please choose an answer before continuing.")
-            # Rerun yapmak zorundayız çünkü form içinde hata gösterimi için sayfayı yenilemek gerekir
             st.rerun()
             return
 
@@ -822,15 +813,12 @@ def render_round():
         st.session_state.responses.append(response)
         st.session_state.current_round += 1
         st.session_state.round_start_time = time.time()
-
-        # Yeni round'a geçerken scroll isteği YOK
         st.rerun()
 
 
 def render_post_quiz():
     """Show two extra questions as a separate page."""
 
-    # Save the 9 quiz responses before asking the final questions.
     if not st.session_state.saved:
         save_results()
         st.session_state.saved = True
@@ -1002,7 +990,6 @@ def render_results():
         save_results()
         st.session_state.saved = True
 
-    # Detector verilerini yükle
     detector_data = get_detector_results()
     if not detector_data:
         st.warning(
@@ -1068,12 +1055,11 @@ def render_results():
         ai_pct = round((ai_correct/ai_total)*100) if ai_total else 0
         st.html(f"""
             <div class="metric-card">
-                <div class="metric-value">No:{non_ai_pct}% / Yes:{ai_pct}%</div>
-                <div class="metric-label">Single‑video accuracy - Not AI / AI</div>
+                <div class="metric-value">Not AI: {non_ai_pct}% / AI: {ai_pct}%</div>
+                <div class="metric-label">Single‑video accuracy</div>
             </div>
         """)
 
-    # -------- MACHINE BASELINE NOTU (SONUÇ) --------
     st.html(f"""
         <div style="
             text-align:center;
@@ -1091,7 +1077,18 @@ def render_results():
         </div>
     """)
 
-    # Review bölümü
+    # -------- TEŞEKKÜR VE FOTOĞRAF (REVIEW'DAN ÖNCE) --------
+    _, center, _ = st.columns([0.45, 2.2, 0.45])
+    with center:
+        st.image("media/ai_demos.png", use_container_width=True)
+
+    st.html("""
+        <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
+            Thanks for taking part.
+        </div>
+    """)
+
+    # -------- REVIEW BÖLÜMÜ --------
     st.html("""
         <div class="review-title">Review your answers</div>
         <div class="review-subtitle">
@@ -1166,46 +1163,24 @@ def render_results():
             if round_data["notes"] == "edited_non_ai":
                 st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI-generated.")
 
-            # -------- AI DETECTOR TAHMİNİNİ GÖSTER --------
+            # -------- AI DETECTOR TAHMİNİ (ROBOT EMOJİSİ YOK, AGREED/DISAGREED YOK) --------
             det_key = round_data["id"]
             if detector_data and det_key in detector_data:
                 det = detector_data[det_key]
                 det_icon = "✅" if det.get("correct", False) else "❌"
                 if "score" in det:  # single video
                     st.caption(
-                        f"🤖 **AI Detector predicted:** {det['prediction']} "
+                        f"**AI Detector predicted:** {det['prediction']} "
                         f"(score: {det['score']:.5f}) {det_icon}"
                     )
-                    # Uyum kontrolü
-                    human_ans = response["answer"]
-                    det_ans = det["prediction"]
-                    if human_ans == det_ans:
-                        st.caption("🤝 You and the AI detector **agreed**.")
-                    else:
-                        st.caption("🤔 You and the AI detector **disagreed**.")
                 else:  # pair video
                     st.caption(
-                        f"🤖 **AI Detector predicted:** {det['prediction']} "
+                        f"**AI Detector predicted:** {det['prediction']} "
                         f"(Left: {det['left_score']:.5f}, Right: {det['right_score']:.5f}) {det_icon}"
                     )
-                    if det["prediction"] == response["answer"]:
-                        st.caption("🤝 You and the AI detector **agreed**.")
-                    else:
-                        st.caption("🤔 You and the AI detector **disagreed**.")
 
     # -------- LEADERBOARD --------
     render_leaderboard()
-
-    # -------- TEŞEKKÜR VE FOTOĞRAF (EN ALT) --------
-    _, center, _ = st.columns([0.45, 2.2, 0.45])
-    with center:
-        st.image("media/ai_demos.png", use_container_width=True)
-
-    st.html("""
-        <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
-            Thanks for taking part.
-        </div>
-    """)
 
     # -------- RESTART --------
     st.write("")
