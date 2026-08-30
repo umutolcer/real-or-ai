@@ -1002,6 +1002,14 @@ def render_results():
         save_results()
         st.session_state.saved = True
 
+    # Detector verilerini yükle
+    detector_data = get_detector_results()
+    if not detector_data:
+        st.warning(
+            "⚠️ Detector results not found. "
+            "Please add `media/detector_results.json` to see AI detector comparisons."
+        )
+
     responses = st.session_state.responses
     total = len(responses)
     correct_count = sum(1 for r in responses if r["correct"])
@@ -1083,16 +1091,7 @@ def render_results():
         </div>
     """)
 
-    _, center, _ = st.columns([0.45, 2.2, 0.45])
-    with center:
-        st.image("media/ai_demos.png", use_container_width=True)
-
-    st.html("""
-        <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
-            Thanks for taking part.
-        </div>
-    """)
-
+    # Review bölümü
     st.html("""
         <div class="review-title">Review your answers</div>
         <div class="review-subtitle">
@@ -1100,9 +1099,6 @@ def render_results():
             You can also see what the AI detector predicted for each piece of media.
         </div>
     """)
-
-    # Detector verilerini yükle
-    detector_data = get_detector_results()
 
     for response in responses:
         round_idx = response["round"] - 1
@@ -1172,7 +1168,7 @@ def render_results():
 
             # -------- AI DETECTOR TAHMİNİNİ GÖSTER --------
             det_key = round_data["id"]
-            if det_key in detector_data:
+            if detector_data and det_key in detector_data:
                 det = detector_data[det_key]
                 det_icon = "✅" if det.get("correct", False) else "❌"
                 if "score" in det:  # single video
@@ -1183,7 +1179,6 @@ def render_results():
                     # Uyum kontrolü
                     human_ans = response["answer"]
                     det_ans = det["prediction"]
-                    # Basit eşleşme: "No" ile "No (Not AI-generated)" vs.
                     if human_ans == det_ans:
                         st.caption("🤝 You and the AI detector **agreed**.")
                     else:
@@ -1193,14 +1188,26 @@ def render_results():
                         f"🤖 **AI Detector predicted:** {det['prediction']} "
                         f"(Left: {det['left_score']:.5f}, Right: {det['right_score']:.5f}) {det_icon}"
                     )
-                    # Uyum kontrolü (sadece Left/Right için)
                     if det["prediction"] == response["answer"]:
                         st.caption("🤝 You and the AI detector **agreed**.")
                     else:
                         st.caption("🤔 You and the AI detector **disagreed**.")
 
+    # -------- LEADERBOARD --------
     render_leaderboard()
 
+    # -------- TEŞEKKÜR VE FOTOĞRAF (EN ALT) --------
+    _, center, _ = st.columns([0.45, 2.2, 0.45])
+    with center:
+        st.image("media/ai_demos.png", use_container_width=True)
+
+    st.html("""
+        <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
+            Thanks for taking part.
+        </div>
+    """)
+
+    # -------- RESTART --------
     st.write("")
     _, restart_col, _ = st.columns([1.4, 1, 1.4])
     with restart_col:
