@@ -501,21 +501,20 @@ def render_start_screen():
     handle_scroll_to_top()
     render_hero()
 
-    # Purpose and motivation
+    # Updated Purpose and motivation
     with st.container(border=True):
         st.markdown(
             """
-### Why this study?
+### Purpose
 
-The goal is to understand **how well people can identify AI‑generated media** in a realistic, everyday context – not just with perfect deepfakes, but with the kinds of images and videos that appear in social media feeds.
+To investigate how people judge AI-generated, authentic, and traditionally edited media, while also raising awareness that AI-generated content is becoming part of everyday social media environments and may not always be easy to recognize.
 
 **A short background:**  
-We often hear about political deepfakes, but the bigger shift may be the slow erosion of trust caused by AI‑generated "slop" that fills our feeds.  
-After discussing this with **Jordi Viader Guerrero** at the DeMoS Lab, we decided to design a simple test:  
-→ Give participants a mix of real, AI‑generated, and traditionally edited media.  
-→ Ask them to judge, and also record their confidence and reaction times.  
+Early discussions around synthetic media often focused on political deepfakes and deliberate deception. More recently, AI-generated images and videos have become part of everyday social media feeds, where they appear alongside authentic and conventionally edited content.
 
-The data from this study will help us explore how exposure to synthetic content affects our perception – and maybe even our trust in what we see online.
+Following a discussion with **Jordi Viader Guerrero** at the DeMoS Lab, I shifted the focus of the project toward this everyday media environment. The study was designed to explore how people judge the authenticity of mixed online media and how confident they are in those judgments.
+
+The data from this study will help explore where people struggle to distinguish synthetic from authentic media, how confidence relates to these judgments, and how participants reflect on trust in the content they encounter online.
             """
         )
 
@@ -1026,35 +1025,40 @@ def render_results():
         </div>
     """)
 
-    # ----- NEW: What you may have noticed -----
+    # ----- What you may have noticed (Updated) -----
     st.html("""
-        <div class="review-title" style="margin-top:1rem;">💡 What you may have noticed</div>
-        <div style="max-width:700px; margin:0 auto 1.5rem auto; text-align:center; opacity:0.7;">
-            Two of the AI‑generated videos had subtle clues that are often missed at first glance.
-        </div>
+        <div class="review-title" style="margin-top:1rem;">What you may have noticed</div>
     """)
 
     col_a, col_b = st.columns(2, gap="large")
     with col_a:
-        st.image("media/Video2.png", use_container_width=True, caption="Video 2 – AI‑generated")
+        st.image("media/Video2.png", use_container_width=True)
         st.markdown(
             """
-            **Video 2** – look closely at the face.  
+            **Video 2** - look closely at the face.  
             There are small distortions around the eyes and mouth, a common sign of generative models struggling with fine details.
             """
         )
     with col_b:
-        st.image("media/Video5.png", use_container_width=True, caption="Video 5 – AI‑generated")
+        st.image("media/Video5.png", use_container_width=True)
         st.markdown(
             """
-            **Video 5** – check the emblem on the shoulder.  
+            **Video 5** - check the emblem on the shoulder.  
             The logo is unnaturally warped, which often happens when an AI tries to generate text or structured symbols.
             """
         )
 
+    # Third image for Delft comparison
+    st.image("media/delft.png", use_container_width=True)
     st.markdown(
         """
-        These are just two examples – detecting AI‑generated media takes practice, and even experts can be fooled.  
+        **Delft comparison** - look at the person in the yellow suit.  
+        The AI-generated version often produces strange artifacts or unnatural details in complex clothing or body proportions.
+        """
+    )
+
+    st.markdown(
+        """
         If you'd like to learn more, I recommend this short article:
 
         > [**"AI slop" – how fake photos and videos are shaping our feeds**](https://techxplore.com/news/2025-05-ai-slop-fake-photos-videos.html)
