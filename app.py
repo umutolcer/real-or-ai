@@ -1091,10 +1091,6 @@ def render_results():
         </div>
     """)
 
-    # -------- TEŞEKKÜR VE FOTOĞRAF (REVIEW'DAN ÖNCE) --------
-    _, center, _ = st.columns([0.45, 2.2, 0.45])
-    with center:
-        st.image("media/ai_demos.png", use_container_width=True)
 
     st.html("""
         <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
