@@ -1048,14 +1048,7 @@ def render_results():
             """
         )
 
-    # Third image for Delft comparison
-    st.image("media/delft.png", use_container_width=True)
-    st.markdown(
-        """
-        **Delft comparison** - look at the person in the yellow suit.  
-        The AI-generated version often produces strange artifacts or unnatural details in complex clothing or body proportions.
-        """
-    )
+    # Delft comparison bölümü buradan kaldırıldı.
 
     st.markdown(
         """
