@@ -513,6 +513,7 @@ To investigate how people judge AI-generated, authentic, and traditionally edite
 Early discussions around synthetic media often focused on political deepfakes and deliberate deception. More recently, AI-generated images and videos have become part of everyday social media feeds, where they appear alongside authentic and conventionally edited content.
 
 Following a discussion with **Jordi Viader Guerrero** and DeMoS AI Lab members, I shifted the focus of the project toward this everyday media environment. The study was designed to explore how people judge the authenticity of mixed online media, how confident they are in those judgments, and to raise awareness of how easily AI-generated content can blend into everyday social media feeds.
+
 The data from this study will help explore where people struggle to distinguish synthetic from authentic media, how confidence relates to these judgments, and how participants reflect on trust in the content they encounter online.
             """
         )
