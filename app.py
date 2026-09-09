@@ -8,35 +8,25 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
-# ==================================================
-# PAGE CONFIG
-# ==================================================
-
+# Page config
 st.set_page_config(
     page_title="Real or AI?",
-    page_icon="🤖",
+    page_icon="media/page_logo.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ==================================================
-# CONSTANTS
-# ==================================================
-
+# Constants & colours
 RESULT_FILE = "data/responses_final.csv"
 MEDIA_BASE = Path("media")
 
-# Colours
 PURPLE = "#6C2E8B"
 LIGHT_PURPLE = "#F3EDF7"
 SOFT_PURPLE = "#DCC8E8"
 GREEN = "#248A57"
 RED = "#B33A3A"
 
-# ==================================================
-# SUPABASE CLIENT (if secrets available)
-# ==================================================
-
+# Supabase connection (if secrets are available)
 try:
     from supabase import create_client, Client
     supabase: Optional[Client] = None
@@ -47,12 +37,9 @@ try:
         )
 except ImportError:
     supabase = None
-    st.warning("Supabase paketi yüklü değil. pip install supabase-py")
+    st.warning("Supabase package not installed. pip install supabase-py")
 
-# ==================================================
-# CSS - Enhanced Design
-# ==================================================
-
+# Custom CSS
 def inject_custom_css():
     st.html(
         f"""
@@ -61,19 +48,16 @@ def inject_custom_css():
             * {{
                 font-family: 'Inter', sans-serif;
             }}
-
             .block-container {{
                 max-width: 1200px;
                 padding-top: 2.2rem;
                 padding-bottom: 4rem;
             }}
-
             .hero {{
                 text-align: center;
                 padding: 0.4rem 0 1.4rem 0;
                 margin-top: 0.2rem;
             }}
-
             .hero-badge {{
                 display: inline-block;
                 color: {PURPLE};
@@ -87,7 +71,6 @@ def inject_custom_css():
                 text-transform: uppercase;
                 margin-bottom: 0.9rem;
             }}
-
             .hero-title {{
                 font-size: clamp(2.8rem, 7vw, 4.6rem);
                 font-weight: 900;
@@ -98,7 +81,6 @@ def inject_custom_css():
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
             }}
-
             .hero-subtitle {{
                 max-width: 700px;
                 margin: 1rem auto 0 auto;
@@ -106,7 +88,6 @@ def inject_custom_css():
                 font-size: 1.1rem;
                 line-height: 1.6;
             }}
-
             .purple-line {{
                 height: 4px;
                 width: 60px;
@@ -114,7 +95,6 @@ def inject_custom_css():
                 background: {PURPLE};
                 margin: 1rem auto 1.5rem auto;
             }}
-
             .round-label {{
                 width: fit-content;
                 margin: 0 auto 0.8rem auto;
@@ -126,30 +106,25 @@ def inject_custom_css():
                 font-weight: 700;
                 letter-spacing: 0.05em;
             }}
-
             .question-heading {{
                 font-size: 1.3rem;
                 font-weight: 800;
                 margin-bottom: 0.2rem;
             }}
-
             .question-subheading {{
                 opacity: 0.65;
                 font-size: 0.95rem;
                 margin-bottom: 0.8rem;
             }}
-
             div[data-testid="stVerticalBlockBorderWrapper"] {{
                 border-radius: 20px;
                 border-color: {SOFT_PURPLE};
                 box-shadow: 0 8px 24px rgba(108, 46, 139, 0.06);
                 transition: box-shadow 0.2s ease;
             }}
-
             div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
                 box-shadow: 0 12px 32px rgba(108, 46, 139, 0.10);
             }}
-
             .stButton > button,
             .stFormSubmitButton > button {{
                 border-radius: 14px;
@@ -159,22 +134,18 @@ def inject_custom_css():
                 transition: all 0.2s ease;
                 border: none;
             }}
-
             .stButton > button:hover,
             .stFormSubmitButton > button:hover {{
                 transform: translateY(-2px);
                 box-shadow: 0 8px 20px rgba(108, 46, 139, 0.25);
             }}
-
             button[kind="primary"] {{
                 background: {PURPLE} !important;
                 color: white !important;
             }}
-
             button[kind="primary"]:hover {{
                 background: #7C3E9E !important;
             }}
-
             div[data-testid="stTextInput"] input {{
                 border-radius: 14px;
                 min-height: 52px;
@@ -182,37 +153,30 @@ def inject_custom_css():
                 border: 1.5px solid {SOFT_PURPLE};
                 transition: border-color 0.2s;
             }}
-
             div[data-testid="stTextInput"] input:focus {{
                 border-color: {PURPLE};
                 box-shadow: 0 0 0 3px rgba(108, 46, 139, 0.15);
             }}
-
             div[data-testid="stRadio"] label p {{
                 font-weight: 600;
                 font-size: 1rem;
             }}
-
             div[data-testid="stRadio"] label {{
                 padding: 0.5rem 0.8rem;
                 border-radius: 12px;
                 transition: background 0.15s;
             }}
-
             div[data-testid="stRadio"] label:hover {{
                 background: {LIGHT_PURPLE};
             }}
-
             div[data-testid="stProgress"] > div > div > div > div {{
                 background: linear-gradient(90deg, {PURPLE}, #A855F7);
                 border-radius: 100px;
             }}
-
             .final-score {{
                 text-align: center;
                 padding: 1.5rem 0 2rem 0;
             }}
-
             .score-number {{
                 font-size: 4.8rem;
                 font-weight: 900;
@@ -223,12 +187,10 @@ def inject_custom_css():
                 line-height: 1.2;
                 margin: 0.5rem 0;
             }}
-
             .score-caption {{
                 font-size: 1.1rem;
                 opacity: 0.7;
             }}
-
             .review-title {{
                 text-align: center;
                 color: {PURPLE};
@@ -237,13 +199,11 @@ def inject_custom_css():
                 margin-top: 2.5rem;
                 margin-bottom: 0.3rem;
             }}
-
             .review-subtitle {{
                 text-align: center;
                 opacity: 0.65;
                 margin-bottom: 1.5rem;
             }}
-
             .correct-box {{
                 background: rgba(36, 138, 87, 0.08);
                 border-left: 5px solid {GREEN};
@@ -251,7 +211,6 @@ def inject_custom_css():
                 border-radius: 12px;
                 margin-bottom: 0.8rem;
             }}
-
             .incorrect-box {{
                 background: rgba(179, 58, 58, 0.08);
                 border-left: 5px solid {RED};
@@ -259,7 +218,6 @@ def inject_custom_css():
                 border-radius: 12px;
                 margin-bottom: 0.8rem;
             }}
-
             .metric-card {{
                 background: {LIGHT_PURPLE};
                 border-radius: 16px;
@@ -267,19 +225,16 @@ def inject_custom_css():
                 text-align: center;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.02);
             }}
-
             .metric-value {{
                 font-size: 2rem;
                 font-weight: 800;
                 color: {PURPLE};
             }}
-
             .metric-label {{
                 font-size: 0.9rem;
                 opacity: 0.7;
                 margin-top: 0.2rem;
             }}
-
             .leaderboard-table {{
                 width: 100%;
                 border-collapse: collapse;
@@ -304,7 +259,6 @@ def inject_custom_css():
                 font-weight: 800;
                 color: {PURPLE};
             }}
-
             @media (max-width: 640px) {{
                 .block-container {{
                     padding-left: 1rem;
@@ -319,10 +273,7 @@ def inject_custom_css():
     )
 
 
-# ==================================================
-# ROUND DEFINITIONS
-# ==================================================
-
+# Media list (9 rounds)
 ROUNDS: List[Dict[str, Any]] = [
     {
         "id": "video1",
@@ -392,10 +343,7 @@ ROUNDS: List[Dict[str, Any]] = [
     }
 ]
 
-# ==================================================
-# SESSION STATE INITIALISATION
-# ==================================================
-
+# Session state initialisation
 def init_session_state():
     defaults = {
         "started": False,
@@ -413,15 +361,10 @@ def init_session_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-
-# ==================================================
-# HELPER FUNCTIONS
-# ==================================================
-
+# Helper functions
 def media_file_exists(path: str) -> bool:
     p = Path(path)
     return p.exists() and p.stat().st_size > 0
-
 
 def validate_round_media(round_data: Dict[str, Any]) -> List[str]:
     missing = []
@@ -434,9 +377,7 @@ def validate_round_media(round_data: Dict[str, Any]) -> List[str]:
                 missing.append(round_data[key])
     return missing
 
-
 def insert_response_to_supabase(row: Dict[str, Any]):
-    """Insert a single response row into Supabase."""
     if supabase is None:
         return
     try:
@@ -447,9 +388,7 @@ def insert_response_to_supabase(row: Dict[str, Any]):
     except Exception as e:
         st.warning(f"Supabase insert error: {e}")
 
-
 def save_results():
-    """Append current session responses to CSV and Supabase."""
     os.makedirs("data", exist_ok=True)
     columns = [
         "participant_name", "participant_id", "timestamp",
@@ -458,18 +397,14 @@ def save_results():
         "response_time_seconds"
     ]
     df = pd.DataFrame(st.session_state.responses, columns=columns)
-    
     if os.path.exists(RESULT_FILE):
         df.to_csv(RESULT_FILE, mode="a", header=False, index=False)
     else:
         df.to_csv(RESULT_FILE, index=False)
-    
     for _, row in df.iterrows():
         insert_response_to_supabase(row.to_dict())
 
-
 def save_post_quiz():
-    """Save post‑quiz answers to CSV and Supabase."""
     if not st.session_state.post_quiz_responses:
         return
     os.makedirs("data", exist_ok=True)
@@ -494,9 +429,7 @@ def save_post_quiz():
         df.to_csv(RESULT_FILE, index=False)
     insert_response_to_supabase(row)
 
-
 def get_all_responses() -> pd.DataFrame:
-    """Fetch all responses from CSV (fallback) or Supabase if available."""
     if supabase is not None:
         try:
             res = supabase.table("responses").select("*").execute()
@@ -508,9 +441,7 @@ def get_all_responses() -> pd.DataFrame:
         return pd.read_csv(RESULT_FILE)
     return pd.DataFrame()
 
-
 def get_detector_results():
-    """Load precomputed detector results from JSON."""
     json_path = Path("media/detector_results.json")
     if not json_path.exists():
         alt_path = Path("media/mediadetector_results.json")
@@ -524,20 +455,15 @@ def get_detector_results():
     except:
         return {}
 
-
 def restart_quiz():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
     st.rerun()
 
-
 def request_scroll_to_top():
-    """Mark that the next page/round should start at the top."""
     st.session_state["should_scroll_to_top"] = True
 
-
 def handle_scroll_to_top():
-    """Scroll to top if requested and clear the flag."""
     if not st.session_state.get("should_scroll_to_top", False):
         return
     st.session_state["should_scroll_to_top"] = False
@@ -555,10 +481,7 @@ def handle_scroll_to_top():
     )
 
 
-# ==================================================
-# UI COMPONENTS
-# ==================================================
-
+# Page components
 def render_hero():
     st.html(
         """
@@ -567,58 +490,64 @@ def render_hero():
             <div class="hero-title">Real or AI?</div>
             <div class="purple-line"></div>
             <div class="hero-subtitle">
-                A short study about how we judge real, edited and AI-generated media online.
+                A short study about how accurately people can judge whether media is AI‑generated,
+                and why it matters in the era of everyday synthetic content.
             </div>
         </div>
         """
     )
 
-
 def render_start_screen():
     handle_scroll_to_top()
     render_hero()
 
+    # Purpose and motivation
     with st.container(border=True):
         st.markdown(
             """
 ### Why this study?
 
-A lot of the early discussion around AI-generated media focused on political deepfakes and the idea that they could strongly manipulate public opinion. That did not always play out as dramatically as expected.
+The goal is to understand **how well people can identify AI‑generated media** in a realistic, everyday context – not just with perfect deepfakes, but with the kinds of images and videos that appear in social media feeds.
 
-At the same time, AI-generated content became much more common in everyday social media feeds. After talking about this with Jordi at the DeMoS Lab, I became more interested in this everyday kind of exposure - people scrolling past real, edited and AI-generated content mixed together.
+**A short background:**  
+We often hear about political deepfakes, but the bigger shift may be the slow erosion of trust caused by AI‑generated "slop" that fills our feeds.  
+After discussing this with **Jordi Viader Guerrero** at the DeMoS Lab, we decided to design a simple test:  
+→ Give participants a mix of real, AI‑generated, and traditionally edited media.  
+→ Ask them to judge, and also record their confidence and reaction times.  
 
-This short study looks at how people judge those different kinds of media.
+The data from this study will help us explore how exposure to synthetic content affects our perception – and maybe even our trust in what we see online.
             """
         )
 
     st.write("")
 
+    # Image (TU Delft logo etc.)
     col_left, col_center, col_right = st.columns([0.55, 2.2, 0.55])
     with col_center:
         st.image("media/demos_lab.png", use_container_width=True)
 
     st.write("")
 
+    # How it works
     with st.container(border=True):
         st.html(f"""
             <div style="color:{PURPLE}; font-weight:800; font-size:1.4rem; margin-bottom:0.7rem;">
                 How it works
             </div>
         """)
-
         st.markdown(
             """
-You will see **9 pieces of media**.
+You will see **9 pieces of media** (videos and images).
 
-For each one, decide whether you think the content is AI-generated and tell us how confident you are.
+For each one, decide whether you think the content is AI‑generated and tell us how confident you are.
 
-Some rounds show two items side by side. Go with your own judgement.
+Some rounds show two items side by side – go with your first impression.
 
-**Estimated time: 4-6 minutes.**
+**Estimated time:** 4‑6 minutes.
             """
         )
 
-        # -------- DETECTOR NOTU (ACCURACY OLMADAN, ROBOT EMOJİSİ YOK) --------
+        # Machine baseline note
         st.markdown(
             """
 **Also:** I tested these media with UniversalFakeDetect as a machine baseline.  
@@ -626,7 +555,7 @@ You can compare your answers with the detector at the end.
             """
         )
 
-        # -------- CONSENT METNİ --------
+        # Data use & consent
         st.markdown(
             """
 ---
@@ -638,18 +567,17 @@ By starting, you agree to these responses being used for the analysis.
             """
         )
 
+        # Start form
         with st.form("start_form"):
             name = st.text_input(
                 "Enter your name or nickname",
                 placeholder="e.g. Umut"
             )
-
             submitted = st.form_submit_button(
                 "Start",
                 type="primary",
                 use_container_width=True
             )
-
             if submitted:
                 cleaned = " ".join(name.split())
                 if not cleaned:
@@ -668,6 +596,7 @@ By starting, you agree to these responses being used for the analysis.
                     st.rerun()
 
 
+# Render functions for single video, video pair, image pair
 def render_single_video(round_data: Dict[str, Any]):
     with st.container(border=True):
         missing = validate_round_media(round_data)
@@ -678,7 +607,7 @@ def render_single_video(round_data: Dict[str, Any]):
         with center:
             st.video(round_data["file"])
         st.html("""
-            <div class="question-heading">Is this video AI-generated?</div>
+            <div class="question-heading">Is this video AI‑generated?</div>
             <div class="question-subheading">Go with your first impression.</div>
         """)
         return st.radio(
@@ -690,7 +619,6 @@ def render_single_video(round_data: Dict[str, Any]):
             key=f"answer_{st.session_state.current_round}"
         )
 
-
 def render_pair_video(round_data: Dict[str, Any]):
     missing = validate_round_media(round_data)
     if missing:
@@ -698,10 +626,10 @@ def render_pair_video(round_data: Dict[str, Any]):
         return None
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-size:1.4rem; font-weight:800;">
-            Which video is AI-generated?
+            Which video is AI‑generated?
         </div>
         <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
-            One of these videos is AI-generated.
+            One of these videos is AI‑generated.
         </div>
     """)
     left_col, right_col = st.columns(2, gap="large")
@@ -714,13 +642,12 @@ def render_pair_video(round_data: Dict[str, Any]):
     st.write("")
     with st.container(border=True):
         return st.radio(
-            "Which video is AI-generated?",
+            "Which video is AI‑generated?",
             ["Left", "Right", "Not sure"],
             index=None,
             horizontal=True,
             key=f"answer_{st.session_state.current_round}"
         )
-
 
 def render_pair_image(round_data: Dict[str, Any]):
     missing = validate_round_media(round_data)
@@ -732,7 +659,7 @@ def render_pair_image(round_data: Dict[str, Any]):
             TU Delft image comparison
         </div>
         <div style="text-align:center; opacity:0.65; margin-bottom:1rem;">
-            One image is authentic. The other is AI-generated.
+            One image is authentic. The other is AI‑generated.
         </div>
     """)
     left_col, right_col = st.columns(2, gap="large")
@@ -745,7 +672,7 @@ def render_pair_image(round_data: Dict[str, Any]):
     st.write("")
     with st.container(border=True):
         return st.radio(
-            "Which image is AI-generated?",
+            "Which image is AI‑generated?",
             ["Left", "Right", "Not sure"],
             index=None,
             horizontal=True,
@@ -753,6 +680,7 @@ def render_pair_image(round_data: Dict[str, Any]):
         )
 
 
+# Round screen (question + confidence scale + submit inside a form)
 def render_round():
     round_num = st.session_state.current_round
     round_data = ROUNDS[round_num]
@@ -762,7 +690,6 @@ def render_round():
     st.write("")
 
     with st.form(key=f"quiz_form_{round_num}"):
-
         if round_data["type"] == "single_video":
             answer = render_single_video(round_data)
         elif round_data["type"] == "pair_video":
@@ -794,7 +721,7 @@ def render_round():
         _, btn_col, _ = st.columns([1.2, 1, 1.2])
         with btn_col:
             submitted = st.form_submit_button(
-                "Lock answer →",
+                "Submit",
                 type="primary",
                 use_container_width=True
             )
@@ -829,9 +756,8 @@ def render_round():
         st.rerun()
 
 
+# Post‑quiz questions
 def render_post_quiz():
-    """Show two extra questions as a separate page."""
-
     if not st.session_state.saved:
         save_results()
         st.session_state.saved = True
@@ -871,11 +797,9 @@ def render_post_quiz():
             horizontal=True,
             key="post_q1"
         )
-
         st.write("")
-
         q2 = st.radio(
-            "Frequent exposure to AI-generated content makes it harder to trust real content.",
+            "Frequent exposure to AI‑generated content makes it harder to trust real content.",
             options=scale_options,
             index=None,
             horizontal=True,
@@ -904,18 +828,15 @@ def render_post_quiz():
             st.rerun()
 
 
+# Leaderboard
 def render_leaderboard():
-    """Display leaderboard safely for CSV and Supabase data."""
-
     df = get_all_responses()
-
     if df.empty:
         st.info("No data yet.")
         return
 
     df["round"] = pd.to_numeric(df["round"], errors="coerce")
     df_rounds = df[(df["round"] >= 1) & (df["round"] <= len(ROUNDS))].copy()
-
     if df_rounds.empty:
         st.info("No quiz data found yet.")
         return
@@ -995,7 +916,12 @@ def render_leaderboard():
     table_html += "</tbody></table>"
     st.html(table_html)
 
+    # Total participant count
+    total_participants = grouped.shape[0]
+    st.caption(f"📊 **{total_participants}** people have completed the quiz so far.")
 
+
+# Results page – now includes "What you may have noticed" section
 def render_results():
     handle_scroll_to_top()
 
@@ -1015,6 +941,7 @@ def render_results():
     correct_count = sum(1 for r in responses if r["correct"])
     avg_confidence = round(sum(r["confidence"] for r in responses) / total, 1) if total else 0
 
+    # Score display
     st.html(f"""
         <div style="text-align:center; color:{PURPLE}; font-weight:800; font-size:1.5rem; margin-bottom:0.5rem;">
             Quiz complete
@@ -1028,6 +955,7 @@ def render_results():
         </div>
     """)
 
+    # Metric cards
     col1, col2, col3 = st.columns(3)
     with col1:
         st.html(f"""
@@ -1073,7 +1001,7 @@ def render_results():
             </div>
         """)
 
-    # -------- MACHINE BASELINE (SADECE SONUÇTA, ORANLA BİRLİKTE) --------
+    # Machine baseline
     st.html(f"""
         <div style="
             text-align:center;
@@ -1091,14 +1019,51 @@ def render_results():
         </div>
     """)
 
-
+    # Thanks
     st.html("""
         <div style="text-align:center; font-size:1.05rem; opacity:0.7; margin: 1rem 0 2rem 0;">
             Thanks for taking part.
         </div>
     """)
 
-    # -------- REVIEW BÖLÜMÜ --------
+    # ----- NEW: What you may have noticed -----
+    st.html("""
+        <div class="review-title" style="margin-top:1rem;">💡 What you may have noticed</div>
+        <div style="max-width:700px; margin:0 auto 1.5rem auto; text-align:center; opacity:0.7;">
+            Two of the AI‑generated videos had subtle clues that are often missed at first glance.
+        </div>
+    """)
+
+    col_a, col_b = st.columns(2, gap="large")
+    with col_a:
+        st.image("media/Video2.png", use_container_width=True, caption="Video 2 – AI‑generated")
+        st.markdown(
+            """
+            **Video 2** – look closely at the face.  
+            There are small distortions around the eyes and mouth, a common sign of generative models struggling with fine details.
+            """
+        )
+    with col_b:
+        st.image("media/Video5.png", use_container_width=True, caption="Video 5 – AI‑generated")
+        st.markdown(
+            """
+            **Video 5** – check the emblem on the shoulder.  
+            The logo is unnaturally warped, which often happens when an AI tries to generate text or structured symbols.
+            """
+        )
+
+    st.markdown(
+        """
+        These are just two examples – detecting AI‑generated media takes practice, and even experts can be fooled.  
+        If you'd like to learn more, I recommend this short article:
+
+        > [**"AI slop" – how fake photos and videos are shaping our feeds**](https://techxplore.com/news/2025-05-ai-slop-fake-photos-videos.html)
+
+        It explains the broader context behind this study and why synthetic content is becoming part of our everyday digital lives.
+        """
+    )
+
+    # Answer review
     st.html("""
         <div class="review-title">Review your answers</div>
         <div class="review-subtitle">
@@ -1171,28 +1136,28 @@ def render_results():
                     </div>
                 """)
             if round_data["notes"] == "edited_non_ai":
-                st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI-generated.")
+                st.info("ℹ️ This video is edited/manipulated using traditional visual effects, but it is **not** AI‑generated.")
 
-            # -------- AI DETECTOR TAHMİNİ (ROBOT EMOJİSİ YOK, AGREED/DISAGREED YOK) --------
+            # AI Detector prediction
             det_key = round_data["id"]
             if detector_data and det_key in detector_data:
                 det = detector_data[det_key]
                 det_icon = "✅" if det.get("correct", False) else "❌"
-                if "score" in det:  # single video
+                if "score" in det:
                     st.caption(
                         f"**AI Detector predicted:** {det['prediction']} "
                         f"(score: {det['score']:.5f}) {det_icon}"
                     )
-                else:  # pair video
+                else:
                     st.caption(
                         f"**AI Detector predicted:** {det['prediction']} "
                         f"(Left: {det['left_score']:.5f}, Right: {det['right_score']:.5f}) {det_icon}"
                     )
 
-    # -------- LEADERBOARD --------
+    # Leaderboard
     render_leaderboard()
 
-    # -------- RESTART --------
+    # Restart
     st.write("")
     _, restart_col, _ = st.columns([1.4, 1, 1.4])
     with restart_col:
@@ -1200,10 +1165,7 @@ def render_results():
             restart_quiz()
 
 
-# ==================================================
-# MAIN APP
-# ==================================================
-
+# Main flow
 def main():
     inject_custom_css()
     init_session_state()
