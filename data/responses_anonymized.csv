@@ -1,0 +1,319 @@
+participant_id,timestamp,round,stimulus_id,stimulus_type,stimulus_notes,ground_truth,answer,correct,confidence,response_time_seconds
+P01,2026-08-30T15:35:41+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,19.84
+P01,2026-08-30T15:36:23+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,2,42.81
+P01,2026-08-30T15:36:45+00:00,3,video3,single_video,authentic,No,No,True,5,22.11
+P01,2026-08-30T15:36:58+00:00,4,video4,single_video,authentic,No,No,True,4,12.4
+P01,2026-08-30T15:37:20+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,21.97
+P01,2026-08-30T15:37:45+00:00,6,video6,single_video,edited_non_ai,No,No,True,1,24.83
+P01,2026-08-30T15:38:36+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,2,50.95
+P01,2026-08-30T15:39:08+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,2,32.16
+P01,2026-08-30T15:39:50+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,1,42.46
+P01,2026-08-30T15:40:24+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P02,2026-08-30T16:15:23+00:00,1,video1,single_video,authentic,No,No,True,4,41.08
+P02,2026-08-30T16:15:44+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,20.95
+P02,2026-08-30T16:16:07+00:00,3,video3,single_video,authentic,No,No,True,3,22.92
+P02,2026-08-30T16:16:30+00:00,4,video4,single_video,authentic,No,No,True,4,22.78
+P02,2026-08-30T16:17:01+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,31.11
+P02,2026-08-30T16:17:23+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,21.88
+P02,2026-08-30T16:17:50+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,27.47
+P02,2026-08-30T16:18:16+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,3,25.82
+P02,2026-08-30T16:19:29+00:00,9,delft,pair_image,left_real_right_ai,Right,Not sure,False,3,72.82
+P02,2026-08-30T16:19:46+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P03,2026-08-30T16:16:06+00:00,1,video1,single_video,authentic,No,No,True,4,36.24
+P03,2026-08-30T16:16:40+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,3,34.0
+P03,2026-08-30T16:17:01+00:00,3,video3,single_video,authentic,No,No,True,3,21.12
+P03,2026-08-30T16:17:23+00:00,4,video4,single_video,authentic,No,No,True,3,21.87
+P03,2026-08-30T16:17:41+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,18.1
+P03,2026-08-30T16:18:01+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,3,19.71
+P03,2026-08-30T16:18:24+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,23.27
+P03,2026-08-30T16:18:47+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,22.88
+P03,2026-08-30T16:19:54+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,67.18
+P03,2026-08-30T16:20:16+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P04,2026-08-30T16:17:28+00:00,1,video1,single_video,authentic,No,No,True,5,33.3
+P04,2026-08-30T16:17:53+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,25.35
+P04,2026-08-30T16:18:15+00:00,3,video3,single_video,authentic,No,No,True,5,21.55
+P04,2026-08-30T16:18:30+00:00,4,video4,single_video,authentic,No,No,True,5,15.04
+P04,2026-08-30T16:18:47+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,5,17.08
+P04,2026-08-30T16:19:18+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,30.69
+P04,2026-08-30T16:19:34+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,5,15.97
+P04,2026-08-30T16:20:24+00:00,8,pair2,pair_video,left_real_right_ai,Right,Not sure,False,1,50.28
+P04,2026-08-30T16:20:50+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,25.55
+P04,2026-08-30T16:20:59+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P05,2026-08-30T16:20:50+00:00,1,video1,single_video,authentic,No,No,True,2,6.83
+P05,2026-08-30T16:20:57+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,1,7.05
+P05,2026-08-30T16:21:02+00:00,3,video3,single_video,authentic,No,No,True,4,5.05
+P05,2026-08-30T16:21:07+00:00,4,video4,single_video,authentic,No,Yes (AI-generated),False,2,4.39
+P05,2026-08-30T16:21:18+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,2,11.04
+P05,2026-08-30T16:21:27+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,2,9.03
+P05,2026-08-30T16:21:38+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,11.08
+P05,2026-08-30T16:21:45+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,6.95
+P05,2026-08-30T16:21:52+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,6.74
+P05,2026-08-30T16:22:34+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P06,2026-08-30T16:21:32+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,37.36
+P06,2026-08-30T16:22:44+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Not sure,False,3,71.95
+P06,2026-08-30T16:23:04+00:00,3,video3,single_video,authentic,No,No,True,4,19.7
+P06,2026-08-30T16:23:17+00:00,4,video4,single_video,authentic,No,No,True,5,13.17
+P06,2026-08-30T16:23:45+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,28.44
+P06,2026-08-30T16:24:16+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,30.7
+P06,2026-08-30T16:25:04+00:00,7,pair1,pair_video,left_ai_right_real,Left,Not sure,False,3,48.23
+P06,2026-08-30T16:25:23+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,18.32
+P06,2026-08-30T16:25:47+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,24.05
+P06,2026-08-30T16:26:04+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P07,2026-08-30T16:22:12+00:00,1,video1,single_video,authentic,No,No,True,4,19.01
+P07,2026-08-30T16:22:24+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,5,12.45
+P07,2026-08-30T16:22:41+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,16.83
+P07,2026-08-30T16:22:52+00:00,4,video4,single_video,authentic,No,No,True,4,10.47
+P07,2026-08-30T16:23:10+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,17.92
+P07,2026-08-30T16:23:21+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,11.41
+P07,2026-08-30T16:23:36+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,4,15.12
+P07,2026-08-30T16:24:04+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,27.6
+P07,2026-08-30T16:24:32+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,28.12
+P07,2026-08-30T16:24:45+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P08,2026-08-30T16:22:20+00:00,1,video1,single_video,authentic,No,No,True,5,17.35
+P08,2026-08-30T16:22:38+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,18.72
+P08,2026-08-30T16:23:18+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,39.55
+P08,2026-08-30T16:23:36+00:00,4,video4,single_video,authentic,No,No,True,5,17.87
+P08,2026-08-30T16:23:50+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,14.12
+P08,2026-08-30T16:24:02+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,12.38
+P08,2026-08-30T16:24:39+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,36.52
+P08,2026-08-30T16:24:54+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,5,15.71
+P08,2026-08-30T16:25:44+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,49.88
+P08,2026-08-30T16:26:20+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P09,2026-08-30T16:23:07+00:00,1,video1,single_video,authentic,No,No,True,4,83.1
+P09,2026-08-30T16:23:32+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Not sure,False,3,24.36
+P09,2026-08-30T16:24:13+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,3,41.35
+P09,2026-08-30T16:24:43+00:00,4,video4,single_video,authentic,No,No,True,3,29.66
+P09,2026-08-30T16:25:04+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,21.92
+P09,2026-08-30T16:25:29+00:00,6,video6,single_video,edited_non_ai,No,No,True,4,24.19
+P09,2026-08-30T16:26:29+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,60.75
+P09,2026-08-30T16:26:59+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,29.49
+P09,2026-08-30T16:27:48+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,48.79
+P09,2026-08-30T16:28:06+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P10,2026-08-30T16:36:40+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,36.23
+P10,2026-08-30T16:36:56+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,3,16.03
+P10,2026-08-30T16:37:10+00:00,3,video3,single_video,authentic,No,Not sure,False,5,13.34
+P10,2026-08-30T16:37:22+00:00,4,video4,single_video,authentic,No,No,True,4,11.98
+P10,2026-08-30T16:37:39+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,16.74
+P10,2026-08-30T16:37:44+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,5.36
+P10,2026-08-30T16:38:00+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,4,16.39
+P10,2026-08-30T16:38:14+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,13.96
+P10,2026-08-30T16:38:22+00:00,9,delft,pair_image,left_real_right_ai,Right,Left,False,4,7.47
+P10,2026-08-30T16:38:30+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 1, ""trust_harder_label"": ""Strongly disagree""}",,0,0.0
+P11,2026-08-30T16:37:31+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,59.74
+P11,2026-08-30T16:39:41+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,130.29
+P11,2026-08-30T16:40:01+00:00,3,video3,single_video,authentic,No,No,True,3,20.48
+P11,2026-08-30T16:40:45+00:00,4,video4,single_video,authentic,No,No,True,3,43.38
+P11,2026-08-30T16:41:05+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,20.14
+P11,2026-08-30T16:41:27+00:00,6,video6,single_video,edited_non_ai,No,No,True,1,21.83
+P11,2026-08-30T16:42:16+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,49.02
+P11,2026-08-30T16:42:57+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,3,40.91
+P11,2026-08-30T16:43:16+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,19.12
+P11,2026-08-30T16:44:06+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P12,2026-08-30T16:40:15+00:00,1,video1,single_video,authentic,No,No,True,5,26.16
+P12,2026-08-30T16:40:36+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,4,21.2
+P12,2026-08-30T16:40:54+00:00,3,video3,single_video,authentic,No,No,True,4,17.94
+P12,2026-08-30T16:41:04+00:00,4,video4,single_video,authentic,No,No,True,5,10.35
+P12,2026-08-30T16:41:17+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,12.66
+P12,2026-08-30T16:42:32+00:00,6,video6,single_video,edited_non_ai,No,Not sure,False,3,75.74
+P12,2026-08-30T16:43:35+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,4,62.44
+P12,2026-08-30T16:43:53+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,18.33
+P12,2026-08-30T16:44:46+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,52.35
+P12,2026-08-30T16:45:12+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P13,2026-08-30T16:41:04+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,79.13
+P13,2026-08-30T16:41:04+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,79.13
+P13,2026-08-30T16:41:09+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,5.57
+P13,2026-08-30T16:41:09+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,5.57
+P13,2026-08-30T16:41:14+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,5.31
+P13,2026-08-30T16:41:14+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,5.31
+P13,2026-08-30T16:41:20+00:00,4,video4,single_video,authentic,No,Yes (AI-generated),False,4,5.99
+P13,2026-08-30T16:41:20+00:00,4,video4,single_video,authentic,No,Yes (AI-generated),False,4,5.99
+P13,2026-08-30T16:41:26+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,5.18
+P13,2026-08-30T16:41:26+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,5.18
+P13,2026-08-30T16:41:29+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,3,3.32
+P13,2026-08-30T16:41:29+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,3,3.32
+P13,2026-08-30T16:41:42+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,12.61
+P13,2026-08-30T16:41:42+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,12.61
+P13,2026-08-30T16:41:46+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,4.82
+P13,2026-08-30T16:41:46+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,4.82
+P13,2026-08-30T16:43:15+00:00,9,delft,pair_image,left_real_right_ai,Right,Left,False,3,88.53
+P13,2026-08-30T16:43:15+00:00,9,delft,pair_image,left_real_right_ai,Right,Left,False,3,88.53
+P13,2026-08-30T16:43:25+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P14,2026-08-30T17:06:29+00:00,1,video1,single_video,authentic,No,No,True,5,14.74
+P14,2026-08-30T17:06:56+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,5,27.07
+P14,2026-08-30T17:07:06+00:00,3,video3,single_video,authentic,No,No,True,5,9.77
+P14,2026-08-30T17:07:12+00:00,4,video4,single_video,authentic,No,No,True,5,6.28
+P14,2026-08-30T17:07:30+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,3,17.57
+P14,2026-08-30T17:08:27+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,57.05
+P14,2026-08-30T17:09:02+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,4,34.86
+P14,2026-08-30T17:09:34+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,4,32.08
+P14,2026-08-30T17:10:06+00:00,9,delft,pair_image,left_real_right_ai,Right,Not sure,False,2,32.22
+P14,2026-08-30T17:10:25+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P15,2026-08-30T17:14:08+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,40.74
+P15,2026-08-30T17:14:47+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,39.82
+P15,2026-08-30T17:15:04+00:00,3,video3,single_video,authentic,No,No,True,4,16.79
+P15,2026-08-30T17:15:16+00:00,4,video4,single_video,authentic,No,No,True,3,11.77
+P15,2026-08-30T17:15:49+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,33.03
+P15,2026-08-30T17:16:10+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,3,20.7
+P15,2026-08-30T17:16:38+00:00,7,pair1,pair_video,left_ai_right_real,Left,Not sure,False,3,28.11
+P15,2026-08-30T17:17:13+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,35.65
+P15,2026-08-30T17:18:19+00:00,9,delft,pair_image,left_real_right_ai,Right,Not sure,False,3,65.97
+P15,2026-08-30T17:18:33+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P16,2026-08-30T17:15:01+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,6.81
+P16,2026-08-30T17:15:01+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,6.81
+P16,2026-08-30T17:15:06+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Not sure,False,4,4.95
+P16,2026-08-30T17:15:06+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Not sure,False,4,4.95
+P16,2026-08-30T17:15:20+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,13.64
+P16,2026-08-30T17:15:20+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,4,13.64
+P16,2026-08-30T17:15:26+00:00,4,video4,single_video,authentic,No,No,True,3,6.66
+P16,2026-08-30T17:15:26+00:00,4,video4,single_video,authentic,No,No,True,3,6.66
+P16,2026-08-30T17:15:39+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,12.7
+P16,2026-08-30T17:15:39+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,12.7
+P16,2026-08-30T17:15:44+00:00,6,video6,single_video,edited_non_ai,No,No,True,4,5.11
+P16,2026-08-30T17:15:44+00:00,6,video6,single_video,edited_non_ai,No,No,True,4,5.11
+P16,2026-08-30T17:15:49+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,5,4.64
+P16,2026-08-30T17:15:49+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,5,4.64
+P16,2026-08-30T17:15:51+00:00,8,pair2,pair_video,left_real_right_ai,Right,Not sure,False,3,2.58
+P16,2026-08-30T17:15:51+00:00,8,pair2,pair_video,left_real_right_ai,Right,Not sure,False,3,2.58
+P16,2026-08-30T17:15:55+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,4.06
+P16,2026-08-30T17:15:55+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,4.06
+P16,2026-08-30T17:16:06+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 3, ""trust_harder_label"": ""In between""}",,0,0.0
+P17,2026-08-30T17:25:41+00:00,1,video1,single_video,authentic,No,No,True,3,20.42
+P17,2026-08-30T17:25:50+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,8.72
+P17,2026-08-30T17:26:01+00:00,3,video3,single_video,authentic,No,No,True,5,11.05
+P17,2026-08-30T17:26:13+00:00,4,video4,single_video,authentic,No,No,True,5,11.75
+P17,2026-08-30T17:26:26+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,5,13.45
+P17,2026-08-30T17:26:37+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,10.86
+P17,2026-08-30T17:27:12+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,5,35.2
+P17,2026-08-30T17:27:37+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,24.46
+P17,2026-08-30T17:28:06+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,29.25
+P17,2026-08-30T17:28:32+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 2, ""skepticism_label"": ""Disagree"", ""trust_harder"": 2, ""trust_harder_label"": ""Disagree""}",,0,0.0
+P18,2026-08-30T17:38:07+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,27.26
+P18,2026-08-30T17:38:35+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,27.59
+P18,2026-08-30T17:38:53+00:00,3,video3,single_video,authentic,No,No,True,3,17.99
+P18,2026-08-30T17:39:06+00:00,4,video4,single_video,authentic,No,No,True,3,13.52
+P18,2026-08-30T17:39:21+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,14.48
+P18,2026-08-30T17:39:37+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,3,16.0
+P18,2026-08-30T17:40:47+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,70.0
+P18,2026-08-30T17:41:23+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,36.0
+P18,2026-08-30T17:42:28+00:00,9,delft,pair_image,left_real_right_ai,Right,Left,False,3,64.91
+P18,2026-08-30T17:42:46+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 1, ""skepticism_label"": ""Strongly disagree"", ""trust_harder"": 1, ""trust_harder_label"": ""Strongly disagree""}",,0,0.0
+P19,2026-08-30T17:46:28+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,1,27.01
+P19,2026-08-30T17:46:51+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,1,22.44
+P19,2026-08-30T17:47:22+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,1,31.42
+P19,2026-08-30T17:47:37+00:00,4,video4,single_video,authentic,No,No,True,5,14.51
+P19,2026-08-30T17:47:59+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,5,22.1
+P19,2026-08-30T17:48:17+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,17.93
+P19,2026-08-30T17:49:15+00:00,7,pair1,pair_video,left_ai_right_real,Left,Not sure,False,3,57.79
+P19,2026-08-30T17:49:35+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,19.87
+P19,2026-08-30T17:49:57+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,22.86
+P19,2026-08-30T17:50:19+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 3, ""trust_harder_label"": ""In between""}",,0,0.0
+P20,2026-08-30T17:51:10+00:00,1,video1,single_video,authentic,No,No,True,4,41.75
+P20,2026-08-30T17:51:21+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,11.06
+P20,2026-08-30T17:51:33+00:00,3,video3,single_video,authentic,No,Not sure,False,5,12.07
+P20,2026-08-30T17:51:42+00:00,4,video4,single_video,authentic,No,Yes (AI-generated),False,5,9.61
+P20,2026-08-30T17:51:50+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Not sure,False,2,7.46
+P20,2026-08-30T17:52:03+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,13.42
+P20,2026-08-30T17:52:13+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,4,10.31
+P20,2026-08-30T17:52:58+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,3,44.44
+P20,2026-08-30T17:53:18+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,19.91
+P20,2026-08-30T17:53:49+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P21,2026-08-30T19:48:39+00:00,1,video1,single_video,authentic,No,No,True,5,19.04
+P21,2026-08-30T19:48:52+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,13.61
+P21,2026-08-30T19:49:15+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,3,22.73
+P21,2026-08-30T19:49:29+00:00,4,video4,single_video,authentic,No,No,True,5,14.23
+P21,2026-08-30T19:49:50+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,5,21.29
+P21,2026-08-30T19:50:07+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,16.24
+P21,2026-08-30T19:50:28+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,5,20.78
+P21,2026-08-30T19:50:49+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,21.19
+P21,2026-08-30T19:51:18+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,29.51
+P21,2026-08-30T19:51:41+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P22,2026-08-30T20:06:13+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,3,16.8
+P22,2026-08-30T20:06:27+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,13.98
+P22,2026-08-30T20:06:36+00:00,3,video3,single_video,authentic,No,No,True,5,8.81
+P22,2026-08-30T20:06:45+00:00,4,video4,single_video,authentic,No,No,True,3,9.15
+P22,2026-08-30T20:07:01+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,2,16.01
+P22,2026-08-30T20:07:15+00:00,6,video6,single_video,edited_non_ai,No,No,True,4,14.02
+P22,2026-08-30T20:07:36+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,20.76
+P22,2026-08-30T20:07:48+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,12.06
+P22,2026-08-30T20:08:08+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,19.99
+P22,2026-08-30T20:08:19+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P23,2026-08-31T09:10:06+00:00,1,video1,single_video,authentic,No,No,True,3,67.67
+P23,2026-08-31T09:10:49+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,2,42.59
+P23,2026-08-31T09:11:39+00:00,3,video3,single_video,authentic,No,No,True,3,49.75
+P23,2026-08-31T09:12:05+00:00,4,video4,single_video,authentic,No,No,True,4,26.11
+P23,2026-08-31T09:12:36+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,1,31.49
+P23,2026-08-31T09:13:02+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,1,25.11
+P23,2026-08-31T09:13:54+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,2,52.25
+P23,2026-08-31T09:14:24+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,30.31
+P23,2026-08-31T09:15:00+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,35.6
+P23,2026-08-31T09:15:42+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P24,2026-09-01T08:55:20+00:00,1,video1,single_video,authentic,No,No,True,3,21.97
+P24,2026-09-01T08:55:42+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Not sure,False,5,21.98
+P24,2026-09-01T08:56:04+00:00,3,video3,single_video,authentic,No,Yes (AI-generated),False,3,21.83
+P24,2026-09-01T08:56:21+00:00,4,video4,single_video,authentic,No,No,True,4,16.79
+P24,2026-09-01T08:56:40+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,3,19.94
+P24,2026-09-01T08:57:00+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,19.8
+P24,2026-09-01T08:57:33+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,2,32.46
+P24,2026-09-01T08:58:03+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,30.25
+P24,2026-09-01T08:58:19+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,16.5
+P24,2026-09-01T08:58:41+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 2, ""skepticism_label"": ""Disagree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P25,2026-09-01T21:36:45+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,5,8.21
+P25,2026-09-01T21:36:51+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,6.05
+P25,2026-09-01T21:36:57+00:00,3,video3,single_video,authentic,No,No,True,5,5.7
+P25,2026-09-01T21:37:04+00:00,4,video4,single_video,authentic,No,No,True,5,6.99
+P25,2026-09-01T21:37:08+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Not sure,False,3,4.66
+P25,2026-09-01T21:37:14+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,5.24
+P25,2026-09-01T21:37:20+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,5,6.71
+P25,2026-09-01T21:37:30+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,5,9.85
+P25,2026-09-01T21:38:16+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,46.3
+P25,2026-09-01T21:39:28+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 3, ""skepticism_label"": ""In between"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
+P26,2026-09-05T16:03:05+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,22.72
+P26,2026-09-05T16:03:51+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,45.93
+P26,2026-09-05T16:04:15+00:00,3,video3,single_video,authentic,No,No,True,5,23.88
+P26,2026-09-05T16:04:24+00:00,4,video4,single_video,authentic,No,No,True,5,8.84
+P26,2026-09-05T16:04:48+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,24.36
+P26,2026-09-05T16:05:11+00:00,6,video6,single_video,edited_non_ai,No,No,True,5,22.39
+P26,2026-09-05T16:05:40+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,4,28.81
+P26,2026-09-05T16:06:27+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,47.12
+P26,2026-09-05T16:07:24+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,5,56.68
+P26,2026-09-05T16:08:52+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 2, ""skepticism_label"": ""Disagree"", ""trust_harder"": 2, ""trust_harder_label"": ""Disagree""}",,0,0.0
+P27,2026-09-13T11:30:04+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,63.89
+P27,2026-09-13T11:30:52+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,47.75
+P27,2026-09-13T11:31:51+00:00,3,video3,single_video,authentic,No,Not sure,False,3,59.59
+P27,2026-09-13T11:32:37+00:00,4,video4,single_video,authentic,No,Not sure,False,3,45.1
+P27,2026-09-13T11:33:03+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Not sure,False,3,26.3
+P27,2026-09-13T11:33:41+00:00,6,video6,single_video,edited_non_ai,No,Not sure,False,3,38.32
+P27,2026-09-13T11:34:27+00:00,7,pair1,pair_video,left_ai_right_real,Left,Not sure,False,3,46.29
+P27,2026-09-13T11:35:03+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,4,35.87
+P27,2026-09-13T11:36:51+00:00,9,delft,pair_image,left_real_right_ai,Right,Not sure,False,3,107.31
+P27,2026-09-13T11:37:16+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 2, ""skepticism_label"": ""Disagree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P28,2026-09-14T10:03:35+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,5,17.36
+P28,2026-09-14T10:03:59+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,23.89
+P28,2026-09-14T10:04:17+00:00,3,video3,single_video,authentic,No,No,True,3,18.19
+P28,2026-09-14T10:04:30+00:00,4,video4,single_video,authentic,No,No,True,4,13.23
+P28,2026-09-14T10:04:48+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,4,17.7
+P28,2026-09-14T10:05:00+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,5,12.65
+P28,2026-09-14T10:05:43+00:00,7,pair1,pair_video,left_ai_right_real,Left,Left,True,3,42.36
+P28,2026-09-14T10:06:02+00:00,8,pair2,pair_video,left_real_right_ai,Right,Right,True,3,18.84
+P28,2026-09-14T10:06:54+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,3,52.14
+P28,2026-09-14T10:07:11+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 4, ""trust_harder_label"": ""Agree""}",,0,0.0
+P29,2026-09-16T09:19:43+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,20.28
+P29,2026-09-16T09:19:55+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,5,12.15
+P29,2026-09-16T09:20:17+00:00,3,video3,single_video,authentic,No,No,True,4,21.98
+P29,2026-09-16T09:20:41+00:00,4,video4,single_video,authentic,No,Yes (AI-generated),False,3,23.38
+P29,2026-09-16T09:20:51+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),Yes (AI-generated),True,3,10.36
+P29,2026-09-16T09:21:11+00:00,6,video6,single_video,edited_non_ai,No,Yes (AI-generated),False,4,20.05
+P29,2026-09-16T09:22:03+00:00,7,pair1,pair_video,left_ai_right_real,Left,Right,False,3,52.2
+P29,2026-09-16T09:22:38+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,4,34.35
+P29,2026-09-16T09:23:43+00:00,9,delft,pair_image,left_real_right_ai,Right,Right,True,4,65.35
+P29,2026-09-16T09:24:30+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 4, ""skepticism_label"": ""Agree"", ""trust_harder"": 1, ""trust_harder_label"": ""Strongly disagree""}",,0,0.0
+P30,2026-09-16T17:28:27+00:00,1,video1,single_video,authentic,No,Yes (AI-generated),False,4,5.4
+P30,2026-09-16T17:28:45+00:00,2,video2,single_video,ai_generated,Yes (AI-generated),No,False,4,18.85
+P30,2026-09-16T17:29:04+00:00,3,video3,single_video,authentic,No,No,True,5,18.27
+P30,2026-09-16T17:29:11+00:00,4,video4,single_video,authentic,No,No,True,4,7.73
+P30,2026-09-16T17:29:18+00:00,5,video5,single_video,ai_generated,Yes (AI-generated),No,False,5,6.47
+P30,2026-09-16T17:29:29+00:00,6,video6,single_video,edited_non_ai,No,No,True,1,11.64
+P30,2026-09-16T17:29:36+00:00,7,pair1,pair_video,left_ai_right_real,Left,Not sure,False,1,6.5
+P30,2026-09-16T17:29:41+00:00,8,pair2,pair_video,left_real_right_ai,Right,Left,False,4,4.98
+P30,2026-09-16T17:29:56+00:00,9,delft,pair_image,left_real_right_ai,Right,Not sure,False,1,15.32
+P30,2026-09-16T17:30:33+00:00,0,post_quiz,post_quiz,,,"{""skepticism"": 5, ""skepticism_label"": ""Strongly agree"", ""trust_harder"": 5, ""trust_harder_label"": ""Strongly agree""}",,0,0.0
